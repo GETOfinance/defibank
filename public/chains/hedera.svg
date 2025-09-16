@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hedera (HBAR)">
+  <title>Hedera (HBAR)</title>
+  <desc>Monochrome Hedera logomark for UI use</desc>
+  <circle cx="128" cy="128" r="128" fill="#000000"/>
+  <!-- Left vertical bar -->
+  <rect x="76" y="54" width="20" height="148" fill="#FFFFFF"/>
+  <!-- Right vertical bar -->
+  <rect x="160" y="54" width="20" height="148" fill="#FFFFFF"/>
+  <!-- Upper connector -->
+  <rect x="96" y="96" width="64" height="16" fill="#FFFFFF"/>
+  <!-- Lower connector -->
+  <rect x="96" y="144" width="64" height="16" fill="#FFFFFF"/>
+</svg>
