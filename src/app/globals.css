@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light mode variables with orange accent */
+  --background: 253 252 251;
+  --foreground: 20 20 20;
+  --card: 252 251 249;
+  --card-foreground: 20 20 20;
+  --accent: 249 115 22;
+  --accent-foreground: 0 0 0;
+  --border: 254 215 170;
+  --input: 255 247 237;
+  --ring: 249 115 22;
+  --muted: 255 247 237;
+  --muted-foreground: 107 114 128;
+  --navbar: 255 251 235;
+  --navbar-border: 249 115 22;
+  --primary: 249 115 22;
+  --primary-foreground: 255 255 255;
+  --secondary: 234 88 12;
+  --sidebar: 254 249 195;
+}
+
+.dark {
+  /* Dark mode variables */
+  --background: 10 10 10;
+  --foreground: 226 232 240;
+  --card: 20 20 20;
+  --card-foreground: 226 232 240;
+  --accent: 249 115 22;
+  --accent-foreground: 0 0 0;
+  --border: 249 115 22;
+  --input: 30 30 30;
+  --ring: 249 115 22;
+  --muted: 30 30 30;
+  --muted-foreground: 161 161 170;
+  --navbar: 10 10 10;
+  --navbar-border: 249 115 22;
+  --primary: 249 115 22;
+  --primary-foreground: 0 0 0;
+  --secondary: 234 88 12;
+  --sidebar: 15 15 15;
+}
+
+@layer base {
+  body {
+    @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))];
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] hover:bg-[rgb(var(--secondary))] transition-colors;
+  }
+
+  .card {
+    @apply bg-[rgb(var(--card))] text-[rgb(var(--card-foreground))] border border-[rgb(var(--border))] rounded-xl;
+  }
+
+  .navbar {
+    @apply bg-[rgb(var(--navbar))/80] backdrop-blur-xl border-b border-[rgb(var(--navbar-border))/20];
+  }
+
+  .sidebar {
+    @apply bg-[rgb(var(--sidebar))/80] backdrop-blur-xl border-r border-[rgb(var(--border))/20];
+  }
+
+  /* Light theme specific components with orange accent - only apply when NOT in dark mode */
+  :root:not(.dark) .card {
+    @apply bg-gradient-to-br from-white to-orange-50/70 border-orange-100/80;
+  }
+
+  :root:not(.dark) .navbar {
+    @apply bg-gradient-to-r from-white to-orange-50/80 border-b border-orange-200/30;
+  }
+
+  :root:not(.dark) .sidebar {
+    @apply bg-gradient-to-l from-white to-orange-50/80 border-r border-orange-200/30;
+  }
+}
+
+@layer utilities {
+  .text-gradient-orange {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600;
+  }
+
+  .animate-gradient {
+    animation: animateGradient 5s ease infinite;
+    background-size: 200% auto;
+  }
+
+  @keyframes animateGradient {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+  }
+
+  /* Additional orange accent utilities */
+  :root:not(.dark) .orange-card-accent {
+    @apply bg-gradient-to-br from-white via-orange-50/30 to-white border-orange-100/50;
+  }
+
+  .orange-glow {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
+  }
+
+  /* Background gradient only for light mode */
+  :root:not(.dark) body {
+    background-image: radial-gradient(circle at top right, rgba(249, 115, 22, 0.05), transparent 60%),
+                      radial-gradient(circle at bottom left, rgba(234, 88, 12, 0.05), transparent 60%);
+  }
+
+  /* Dark mode specific enhancements */
+  .dark .card {
+    @apply bg-[rgb(var(--card))] border-[rgb(var(--border))];
+  }
+
+  .dark .sidebar,
+  .dark .navbar {
+    @apply bg-[rgb(var(--background))/90] backdrop-blur-xl border-[rgb(var(--border))]/30;
+  }
+}
+
+/* Orbital dashboard styles */
+.glass-morphism-dark {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08),
+              0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.chart-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
