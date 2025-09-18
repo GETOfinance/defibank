@@ -1,0 +1,108 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IOrbitalMathHelper",
+  "sourceName": "contracts/IntegratedOrbital.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "r",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "k",
+          "type": "uint256"
+        }
+      ],
+      "name": "calculateBoundaryTickS",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "reserves",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "calculateRadius",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "sum_interior_reserves",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "interior_consolidated_radius",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "boundary_consolidated_radius",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "boundary_total_k_bound",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "total_reserves",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "token_in_index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "token_out_index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount_in_after_fee",
+          "type": "uint256"
+        }
+      ],
+      "name": "solveTorusInvariant",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

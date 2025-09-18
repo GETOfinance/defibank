@@ -1,0 +1,24 @@
+{
+  "name": "protectedpay-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "hardhat compile",
+    "deploy:hedera": "hardhat run scripts/deploy.js --network hederaTestnet",
+    "deploy:orbital:hedera": "hardhat run scripts/deploy-orbital.js --network hederaTestnet",
+    "smoke:hedera": "node scripts/smoke.js --network hederaTestnet",
+    "verify:hedera": "hardhat run scripts/verify.js --network hederaTestnet",
+    "test:hedera": "hardhat run scripts/verify-deployment.js --network hederaTestnet",
+    "deploy:stablecoins:hedera": "hardhat run scripts/deploy-stablecoins.js --network hederaTestnet",
+    "deploy:stablecoins:pro:hedera": "hardhat run scripts/deploy-stablecoins-pro.js --network hederaTestnet",
+    "deploy:mockusdt:hedera": "hardhat run scripts/deploy-mockusdt.js --network hederaTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.10"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
+  }
+}
