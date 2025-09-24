@@ -34,7 +34,7 @@ export default function MintActions({ address, scAddress, usdtAddress, symbol, a
           usdt.allowance(address, scAddress),
         ])
         if (bal.lt(required)) {
-          setError("Insufficient USDT balance for mint.")
+          setError("Insufficient USDC balance for mint.")
           setNeedApprove(false)
         } else if (allowance.lt(required)) {
           setNeedApprove(true)
@@ -42,7 +42,7 @@ export default function MintActions({ address, scAddress, usdtAddress, symbol, a
           setNeedApprove(false)
         }
       } catch (e) {
-        setError("Failed to check USDT allowance/balance.")
+        setError("Failed to check USDC allowance/balance.")
       }
       setChecking(false)
     }
@@ -80,7 +80,7 @@ export default function MintActions({ address, scAddress, usdtAddress, symbol, a
   if (needApprove) {
     return (
       <button type="button" onClick={doApprove} disabled={approving} className="w-full md:w-auto px-6 py-3 rounded-xl bg-amber-500 text-white font-medium disabled:opacity-50">
-        {approving ? 'Approving…' : 'Approve USDT'}
+        {approving ? 'Approving…' : 'Approve USDC'}
       </button>
     )
   }

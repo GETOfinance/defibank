@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { IERC20_ABI, ORBITAL_POOL_ABI } from './abi';
 
-export type TokenSymbol = 'USDC' | 'USDT' | 'DAI' | 'FRAX' | 'LUSD';
+export type TokenSymbol = 'USDC' | 'ZAR' | 'NGN' | 'KES' | 'UGX';
 
 export interface TokenInfo {
   symbol: TokenSymbol;
@@ -26,7 +26,7 @@ export function getOrbitalAddressesByChainId(chainId: number): OrbitalAddresses 
 }
 
 export function tokenIndex(symbol: TokenSymbol): number {
-  return ['USDC', 'USDT', 'DAI', 'FRAX', 'LUSD'].indexOf(symbol);
+  return ['USDC', 'ZAR', 'NGN', 'KES', 'UGX'].indexOf(symbol as any);
 }
 
 export function getERC20(address: string, signerOrProvider: ethers.Signer | ethers.providers.Provider) {

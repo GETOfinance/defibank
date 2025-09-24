@@ -1,6 +1,6 @@
-// Mock Oracle: Returns African currency prices relative to 1 USDT
-// All prices are the amount of local currency per 1 USDT
-// Example: NGN = 1600 means 1 USDT ~= 1600 NGN
+// Mock Oracle: Returns African currency prices relative to 1 USDC
+// All prices are the amount of local currency per 1 USDC
+// Example: NGN = 1600 means 1 USDC ~= 1600 NGN
 
 export type AfricanCurrency =
   | 'NGN' | 'KES' | 'GHS' | 'ZAR' | 'UGX' | 'TZS' | 'MAD' | 'EGP' | 'XOF' | 'XAF'
@@ -60,16 +60,16 @@ export function getOraclePrice(symbol: AfricanCurrency): OraclePrice | undefined
   return oraclePrices.find(p => p.symbol === symbol);
 }
 
-// Helpers to convert between local currency stablecoin and USDT
+// Helpers to convert between local currency stablecoin and USDC
 export function localToUSDT(amountLocal: number, symbol: AfricanCurrency): number {
   const price = getOraclePrice(symbol);
   if (!price) return 0;
-  return amountLocal / price.perUSDT; // local / (local per 1 usdt) = usdt
+  return amountLocal / price.perUSDT; // local / (local per 1 usdc) = usdc
 }
 
 export function usdtToLocal(amountUSDT: number, symbol: AfricanCurrency): number {
   const price = getOraclePrice(symbol);
   if (!price) return 0;
-  return amountUSDT * price.perUSDT; // usdt * (local per 1 usdt) = local
+  return amountUSDT * price.perUSDT; // usdc * (local per 1 usdc) = local
 }
 

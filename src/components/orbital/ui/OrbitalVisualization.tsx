@@ -15,10 +15,10 @@ export function OrbitalVisualization({ className = '' }: OrbitalVisualizationPro
   // Mock liquidity data for visualization
   const liquidityPoints = [
     { token: 'USDC', amount: 1250000, angle: 0, radius: 80, color: '#f97316' },
-    { token: 'USDT', amount: 980000, angle: 72, radius: 65, color: '#f59e0b' },
-    { token: 'DAI', amount: 750000, angle: 144, radius: 55, color: '#eab308' },
-    { token: 'FRAX', amount: 420000, angle: 216, radius: 40, color: '#ca8a04' },
-    { token: 'LUSD', amount: 140000, angle: 288, radius: 25, color: '#a16207' }
+    { token: 'ZAR', amount: 980000, angle: 72, radius: 65, color: '#16a34a' },
+    { token: 'NGN', amount: 750000, angle: 144, radius: 55, color: '#f59e0b' },
+    { token: 'KES', amount: 420000, angle: 216, radius: 40, color: '#16a34a' },
+    { token: 'UGX', amount: 140000, angle: 288, radius: 25, color: '#22c55e' }
   ]
 
   return (

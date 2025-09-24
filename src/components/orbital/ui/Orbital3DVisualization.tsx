@@ -26,10 +26,10 @@ export function Orbital3DVisualization({
   // Liquidity data for 3D positioning
   const liquidityData = [
     { token: 'USDC', amount: 1250000, color: 0xf97316, position: [2, 0, 0] },
-    { token: 'USDT', amount: 980000, color: 0xf59e0b, position: [1.4, 1.4, 0] },
-    { token: 'DAI', amount: 750000, color: 0xeab308, position: [0, 2, 0] },
-    { token: 'FRAX', amount: 420000, color: 0xca8a04, position: [-1.4, 1.4, 0] },
-    { token: 'LUSD', amount: 140000, color: 0xa16207, position: [-2, 0, 0] }
+    { token: 'ZAR', amount: 980000, color: 0x16a34a, position: [1.4, 1.4, 0] },
+    { token: 'NGN', amount: 750000, color: 0xf59e0b, position: [0, 2, 0] },
+    { token: 'KES', amount: 420000, color: 0x16a34a, position: [-1.4, 1.4, 0] },
+    { token: 'UGX', amount: 140000, color: 0x22c55e, position: [-2, 0, 0] }
   ]
 
   useEffect(() => {

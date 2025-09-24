@@ -29,13 +29,13 @@ export default function OrbitalPoolPage() {
   const { address, chain } = useAccount();
   const [tab, setTab] = useState<"swap" | "liquidity" | "analytics">("swap");
   const [fromToken, setFromToken] = useState("USDC");
-  const [toToken, setToToken] = useState("USDT");
+  const [toToken, setToToken] = useState("ZAR");
   const [fromAmount, setFromAmount] = useState("");
 
   const orbital = useOrbital();
 
   // derive metrics from on-chain where possible
-  const tokensList = ["USDC","USDT","DAI","FRAX","LUSD"] as const;
+  const tokensList = ["USDC","ZAR","NGN","KES","UGX"] as const;
   const poolTokens = useMemo(() => tokensList.map((s) => ({ symbol: s })), []);
 
 
@@ -129,7 +129,7 @@ export default function OrbitalPoolPage() {
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2 text-xs text-[rgb(var(--muted-foreground))]">
                   <span>FROM</span>
-                  <span>BALANCE: 0.00</span>
+                  <span>BALANCE: {(() => { const i = (tokensList as readonly string[]).indexOf(fromToken as any); return i >= 0 ? (orbital.balances[i] ?? '0') : '0'; })()}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))]/40">
                   <input
@@ -164,7 +164,7 @@ export default function OrbitalPoolPage() {
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2 text-xs text-[rgb(var(--muted-foreground))]">
                   <span>TO</span>
-                  <span>BALANCE: 0.00</span>
+                  <span>BALANCE: {(() => { const i = (tokensList as readonly string[]).indexOf(toToken as any); return i >= 0 ? (orbital.balances[i] ?? '0') : '0'; })()}</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))]/40">
                   <input

@@ -112,7 +112,7 @@ export function useOrbital() {
     const pool = getPool(addresses.pool, signer);
     // Build uint256[5]
     const arr: any[] = [0,0,0,0,0];
-    const syms = ['USDC','USDT','DAI','FRAX','LUSD'];
+    const syms = ['USDC','ZAR','NGN','KES','UGX'];
     for (let i=0;i<5;i++) {
       const sym = syms[i];
       const amt = toBaseUnits(amountsBySymbol[sym] || '0', decimals[i]);

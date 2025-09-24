@@ -33,6 +33,7 @@ const navItems = [
   { href: '/dashboard/stablecoins', label: 'StableCoins', icon: <CurrencyDollarIcon className="w-5 h-5" /> },
   { href: '/dashboard/exchange', label: 'Exchange', icon: <ArrowsRightLeftIcon className="w-5 h-5" /> },
   { href: '/dashboard/loans', label: 'Loans', icon: <BuildingLibraryIcon className="w-5 h-5" /> },
+  { href: '/dashboard/faucet', label: 'Faucet', icon: <BanknotesIcon className="w-5 h-5" /> },
 ]
 
 interface DashboardSidebarProps {

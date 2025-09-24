@@ -7,12 +7,12 @@ import { oraclePrices, AfricanCurrency, getOraclePrice, localToUSDT } from "@/ut
 import { useAccount } from "wagmi";
 import { getHoldings, getHistory, mintStablecoin, burnStablecoin, HistoryItem } from "@/utils/stablecoinService";
 import { getStableCoinsAddress, getStableCoins, symbolToBytes32, toUnits, fromUnits } from "@/utils/stablecoinsClient";
-import { getERC20, getUsdtAddress } from "@/utils/erc20Client";
+import { getERC20, getUsdcAddress } from "@/utils/erc20Client";
 import { ethers } from "ethers";
 import MintActions from "./MintActions";
 
 // This page simulates minting and burning African currency stablecoins
-// backed by USDT price using a mock oracle. No on-chain txs are performed.
+// backed by USDC price using a mock oracle. No on-chain txs are performed.
 
 export default function StablecoinsPage() {
   const { address } = useAccount();
@@ -29,7 +29,7 @@ export default function StablecoinsPage() {
 
   useEffect(() => {
     setScAddress(getStableCoinsAddress(296));
-    setUsdtAddress(getUsdtAddress(296));
+    setUsdtAddress(getUsdcAddress(296));
     setHoldings(getHoldings());
     setHistory(getHistory());
   }, []);
@@ -60,7 +60,7 @@ export default function StablecoinsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-[rgb(var(--foreground))]">StableCoins</h1>
-            <p className="text-[rgb(var(--muted-foreground))]">Mint and burn African currency stablecoins using mock USDT oracle prices.</p>
+            <p className="text-[rgb(var(--muted-foreground))]">Mint and burn African currency stablecoins using mock USDC oracle prices.</p>
           </div>
         </div>
         <motion.div className="card backdrop-blur-lg p-8 text-center">
@@ -83,9 +83,9 @@ export default function StablecoinsPage() {
     if (!price) return "";
     const numLocal = parseFloat(amountLocal || "0");
     if (mode === "mint") {
-      return `You will mint approximately ${numLocal.toLocaleString()} ${symbol} backed by ${amountUSDT.toFixed(2)} USDT`;
+      return `You will mint approximately ${numLocal.toLocaleString()} ${symbol} backed by ${amountUSDT.toFixed(2)} USDC`;
     } else {
-      return `You will burn approximately ${numLocal.toLocaleString()} ${symbol} to redeem ${amountUSDT.toFixed(2)} USDT`;
+      return `You will burn approximately ${numLocal.toLocaleString()} ${symbol} to redeem ${amountUSDT.toFixed(2)} USDC`;
     }
   }, [amountLocal, amountUSDT, mode, price, symbol]);
 
@@ -112,11 +112,11 @@ export default function StablecoinsPage() {
             usdt.allowance(address, scAddress),
           ]);
           if (bal.lt(requiredUsdt)) {
-            setError("Insufficient USDT balance for mint.");
+            setError("Insufficient USDC balance for mint.");
             return;
           }
           if (allowance.lt(requiredUsdt)) {
-            setError("Allowance too low. Please approve USDT first.");
+            setError("Allowance too low. Please approve USDC first.");
             return;
           }
           setMinting(true);
@@ -124,7 +124,7 @@ export default function StablecoinsPage() {
           await tx.wait();
           setMinting(false);
         } else {
-          // burn will redeem USDT back to user
+          // burn will redeem USDC back to user
           const tx = await contract.burn(symbolBytes, units);
           await tx.wait();
         }
@@ -140,7 +140,7 @@ export default function StablecoinsPage() {
       } catch (err: any) {
         console.error('StableCoins tx failed:', err);
         const msg = (err?.reason || err?.message || "").toLowerCase();
-        if (msg.includes("transferfrom")) setError("USDT transferFrom failed. Check allowance and balance.");
+        if (msg.includes("transferfrom")) setError("USDC transferFrom failed. Check allowance and balance.");
         else if (msg.includes("oracle")) setError("Oracle rate unavailable for this currency.");
         else if (msg.includes("reserve")) setError("Contract reserves are insufficient to redeem right now.");
         else setError("Transaction failed. See console for details.");
@@ -166,7 +166,7 @@ export default function StablecoinsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-[rgb(var(--foreground))]">StableCoins</h1>
-          <p className="text-[rgb(var(--muted-foreground))]">Mint and burn African currency stablecoins using mock USDT oracle prices.</p>
+          <p className="text-[rgb(var(--muted-foreground))]">Mint and burn African currency stablecoins using mock USDC oracle prices.</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function StablecoinsPage() {
               </div>
               <div>
                 <h2 className="text-lg font-medium text-[rgb(var(--foreground))]">{mode === "mint" ? "Mint Stablecoin" : "Burn Stablecoin"}</h2>
-                <p className="text-sm text-[rgb(var(--muted-foreground))]">Backed by USDT via mock oracle pricing</p>
+                <p className="text-sm text-[rgb(var(--muted-foreground))]">Backed by USDC via mock oracle pricing</p>
               </div>
             </div>
 
@@ -218,7 +218,7 @@ export default function StablecoinsPage() {
                 ))}
               </select>
               {price && (
-                <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">Oracle: 1 USDT ≈ {price.perUSDT.toLocaleString()} {symbol}</p>
+                <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">Oracle: 1 USDC ≈ {price.perUSDT.toLocaleString()} {symbol}</p>
               )}
             </div>
 
@@ -235,7 +235,7 @@ export default function StablecoinsPage() {
                 className="w-full px-4 py-3 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))]/40 focus:outline-none"
               />
               {amountLocal && (
-                <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">≈ {amountUSDT.toFixed(2)} USDT</p>
+                <p className="text-xs text-[rgb(var(--muted-foreground))] mt-1">≈ {amountUSDT.toFixed(2)} USDC</p>
               )}
               {error && (
                 <p className="text-xs text-red-500 mt-1">{error}</p>
@@ -301,7 +301,7 @@ export default function StablecoinsPage() {
               <div key={h.id} className="flex items-center justify-between text-sm py-2 border-b border-[rgb(var(--border))]/30">
                 <div className="flex-1">
                   <div className="font-medium text-[rgb(var(--foreground))]">{h.action.toUpperCase()} {h.amountLocal.toLocaleString()} {h.symbol}</div>
-                  <div className="text-[rgb(var(--muted-foreground))]">Ref: {h.amountUSDT.toFixed(2)} USDT • {new Date(h.timestamp).toLocaleString()}</div>
+                  <div className="text-[rgb(var(--muted-foreground))]">Ref: {h.amountUSDT.toFixed(2)} USDC • {new Date(h.timestamp).toLocaleString()}</div>
                 </div>
               </div>
             ))}

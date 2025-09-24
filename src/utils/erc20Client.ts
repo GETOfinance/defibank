@@ -11,9 +11,14 @@ export function getERC20(address: string, signerOrProvider: ethers.Signer | ethe
   return new ethers.Contract(address, ERC20_ABI, signerOrProvider)
 }
 
-export function getUsdtAddress(chainId?: number): string | undefined {
+export function getUsdcAddress(chainId?: number): string | undefined {
   const id = chainId ?? 296
-  if (id === 296) return process.env.NEXT_PUBLIC_USDT_ADDRESS_296
+  if (id === 296) return process.env.NEXT_PUBLIC_USDC_ADDRESS_296 || process.env.NEXT_PUBLIC_USDT_ADDRESS_296
   return undefined
+}
+
+// Backward-compat alias (kept temporarily). Prefer getUsdcAddress.
+export function getUsdtAddress(chainId?: number): string | undefined {
+  return getUsdcAddress(chainId)
 }
 

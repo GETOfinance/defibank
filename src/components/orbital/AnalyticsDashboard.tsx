@@ -52,7 +52,7 @@ export function AnalyticsDashboard() {
     }
   ]
 
-  const tokenOptions = ['USDC','USDT','DAI','FRAX','LUSD']
+  const tokenOptions = ['USDC','ZAR','NGN','KES','UGX']
 
   return (
     <div className="space-y-6">
@@ -78,8 +78,15 @@ export function AnalyticsDashboard() {
                   if (active) set.delete(sym); else set.add(sym)
                   setTokens(Array.from(set))
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs border ${active? 'bg-orange-500 text-black border-transparent':'bg-transparent text-orange-300 border-orange-500/30 hover:bg-orange-500/10'}`}
-              >{sym}</button>
+                className={`flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs border ${active? 'bg-orange-500 text-black border-transparent':'bg-transparent text-orange-300 border-orange-500/30 hover:bg-orange-500/10'}`}
+              >
+                {sym === 'UGX' && <img src="/tokens/ugx-uganda.svg" alt="UGX" className="w-4 h-4" />}
+                {sym === 'ZAR' && <img src="/tokens/zar.svg" alt="ZAR" className="w-4 h-4" />}
+                {sym === 'USDC' && <img src="/tokens/usdc.svg" alt="USDC" className="w-4 h-4" />}
+                {sym === 'NGN' && <img src="/tokens/ngn.svg" alt="NGN" className="w-4 h-4" />}
+                {sym === 'KES' && <img src="/tokens/kes.svg" alt="KES" className="w-4 h-4" />}
+                {sym}
+              </button>
             )
           })}
         </div>

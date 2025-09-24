@@ -68,13 +68,14 @@ export function useOrbitalAnalytics() {
 
     const writePoint = () => {
       // TVL approximation (stablecoins ~ $1)
-      const symbols = ["USDC","USDT","DAI","FRAX","LUSD"] as const;
+      const symbols = ["USDC","ZAR","NGN","KES","UGX"] as const;
       const considered = prefs.tokens && prefs.tokens.length > 0 ? prefs.tokens : symbols as unknown as string[];
       const tvl = orbital.reserves.reduce((acc, r, i) => {
         const sym = symbols[i] as unknown as string;
         if (!considered.includes(sym)) return acc;
         return acc + Number(r) / 10 ** (orbital.decimals[i] || 18);
       }, 0);
+      // Note: We treat stables as 1 unit each; ZAR is treated as a tokenized Rand in the demo.
       const now = Date.now();
       const point: AnalyticsPoint = { t: now, liquidity: tvl };
       setSeries((prev) => {

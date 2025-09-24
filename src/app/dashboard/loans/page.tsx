@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import {
@@ -11,6 +11,8 @@ import {
   InformationCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+import { useLoans } from "@/hooks/useLoans";
+import { getOrbitalAddressesByChainId } from "@/utils/orbital/client";
 
 // Compact stat tile
 function StatTile({ label, value, tone = "default" }: { label: string; value: string; tone?: "default" | "success" | "danger" }) {
@@ -29,7 +31,8 @@ function StatTile({ label, value, tone = "default" }: { label: string; value: st
 }
 
 // Labeled input
-function LabeledInput({ label, placeholder, right }: { label: string; placeholder: string; right?: string }) {
+function LabeledInput({ label, placeholder, right, value, onChange }: { label: string; placeholder: string; right?: string; value?: string; onChange?: (v: string) => void }) {
+  const controlled = value !== undefined;
   return (
     <div>
       <label className="block text-sm mb-1 text-[rgb(var(--muted-foreground))]">{label}</label>
@@ -37,6 +40,8 @@ function LabeledInput({ label, placeholder, right }: { label: string; placeholde
         <input
           type="number"
           placeholder={placeholder}
+          value={controlled ? value : undefined}
+          onChange={controlled ? (e) => onChange?.(e.target.value) : undefined}
           className="w-full px-3 py-2 rounded-lg bg-[rgb(var(--muted))]/40 border border-[rgb(var(--border))]/40 outline-none focus:ring-2 focus:ring-[rgb(var(--primary))]/30"
         />
         {right && <span className="text-sm text-[rgb(var(--muted-foreground))] px-2">{right}</span>}
@@ -45,12 +50,108 @@ function LabeledInput({ label, placeholder, right }: { label: string; placeholde
   );
 }
 
-export default function LoansPage() {
+function LiveReadouts({ usdcAddress }: { usdcAddress?: string }) {
   const { address } = useAccount();
+  const loans = useLoans();
+  const [stats, setStats] = useState<{ totalDeposits: string; totalBorrowed: string; protocolFees: string; utilizationRate: string } | null>(null);
+  const [profile, setProfile] = useState<{ healthFactor: string; creditScore: string; lastActivity: string; isActive: boolean } | null>(null);
 
-  // Local UI state only (no contract integration yet)
+  useEffect(() => {
+    (async () => {
+      try {
+        const s = await loans.getProtocolStats();
+        setStats(s as any);
+        if (address) {
+          const p = await loans.getUserProfile(address);
+          setProfile(p as any);
+        }
+      } catch {}
+    })();
+  }, [loans, address]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
+        <div className="text-sm mb-2 font-medium">Protocol Stats</div>
+        <div className="text-xs text-[rgb(var(--muted-foreground))] space-y-1">
+          <div>Total Deposits: {stats?.totalDeposits ?? '0'}</div>
+          <div>Total Borrowed: {stats?.totalBorrowed ?? '0'}</div>
+          <div>Utilization: {stats?.utilizationRate ?? '0'}</div>
+          <div>Protocol Fees: {stats?.protocolFees ?? '0'}</div>
+        </div>
+      </div>
+      <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
+        <div className="text-sm mb-2 font-medium">Your Profile</div>
+        <div className="text-xs text-[rgb(var(--muted-foreground))] space-y-1">
+          <div>Health Factor: {profile?.healthFactor ?? '—'}</div>
+          <div>Credit Score: {profile?.creditScore ?? '—'}</div>
+          <div>Last Activity: {profile?.lastActivity ?? '—'}</div>
+          <div>Status: {profile?.isActive ? 'Active' : 'Inactive'}</div>
+        </div>
+      </div>
+      <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
+        <div className="text-sm mb-2 font-medium">Config</div>
+        <div className="text-xs text-[rgb(var(--muted-foreground))] space-y-1">
+          <div>Hub: {loans.addresses?.hub ? `${loans.addresses.hub.slice(0,6)}...${loans.addresses.hub.slice(-4)}` : 'not set'}</div>
+          <div>USDC: {usdcAddress ? `${usdcAddress.slice(0,6)}...${usdcAddress.slice(-4)}` : '—'}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+export default function LoansPage() {
+  const { address, chain } = useAccount();
+  const loans = useLoans();
+
+  // Local UI state + contract wiring
   const [lendAsset, setLendAsset] = useState<"HBAR" | "USDC">("HBAR");
   const [borrowAsset, setBorrowAsset] = useState<"HBAR" | "USDC">("HBAR");
+  const [depositAmt, setDepositAmt] = useState("");
+  const [withdrawAmt, setWithdrawAmt] = useState("");
+  const [borrowAmt, setBorrowAmt] = useState("");
+  const [repayAmt, setRepayAmt] = useState("");
+  const [status, setStatus] = useState<string>("");
+  const [usdcDeposit, setUsdcDeposit] = useState("0");
+  const [usdcDebt, setUsdcDebt] = useState("0");
+
+  const usdcAddress = useMemo(() => {
+    const cid = loans.chainId || chain?.id;
+    if (!cid) return undefined;
+    const orbital = getOrbitalAddressesByChainId(cid);
+    return orbital?.tokens?.[0];
+  }, [loans.chainId, chain?.id]);
+
+  // Wrapped HBAR ERC-20 address mapping (Hedera Testnet supported)
+  const HBAR_ADDRESSES: Record<number, string | undefined> = useMemo(() => ({
+    296: process.env.NEXT_PUBLIC_HBAR_ERC20_ADDRESS_296,
+  }), []);
+  const hbarErc20 = useMemo(() => {
+    const cid = loans.chainId || chain?.id;
+    if (!cid) return undefined;
+    return HBAR_ADDRESSES[cid];
+  }, [HBAR_ADDRESSES, loans.chainId, chain?.id]);
+
+  // Resolve the ERC-20 address for the selected asset
+  const tokenAddressFor = useMemo(() => ({
+    lend: (asset: "HBAR"|"USDC") => asset === "USDC" ? usdcAddress : hbarErc20,
+    borrow: (asset: "HBAR"|"USDC") => asset === "USDC" ? usdcAddress : hbarErc20,
+  }), [usdcAddress, hbarErc20]);
+
+  useEffect(() => {
+    (async () => {
+      if (!address || !usdcAddress) return;
+      try {
+        const [dep, debt] = await Promise.all([
+          loans.getUserDeposits(address, usdcAddress),
+          loans.getUserBorrowed(address, usdcAddress),
+        ]);
+        setUsdcDeposit(dep);
+        setUsdcDebt(debt);
+      } catch {}
+    })();
+  }, [address, usdcAddress, loans]);
 
   const poolStats = useMemo(
     () => ({
@@ -80,13 +181,24 @@ export default function LoansPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Live data */}
+      <LiveReadouts usdcAddress={usdcAddress} />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-[rgb(var(--foreground))]">Loans</h1>
+
+
           <p className="text-[rgb(var(--muted-foreground))]">Multi-Asset Lending and Borrowing</p>
         </div>
       </div>
+      {status && (
+
+        <div className="rounded-lg border border-[rgb(var(--border))]/40 bg-[rgb(var(--muted))]/40 text-sm px-3 py-2">
+          {status}
+        </div>
+      )}
+
 
       {/* Pool Statistics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -155,11 +267,11 @@ export default function LoansPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
               <div className="text-sm mb-2 font-medium">Your Balances</div>
-              <div className="text-sm text-[rgb(var(--muted-foreground))]">HBAR: 0.0000 • USDC: 0.00</div>
+              <div className="text-sm text-[rgb(var(--muted-foreground))]">USDC Deposited: {usdcDeposit} • USDC Debt: {usdcDebt}</div>
             </div>
             <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
-              <div className="text-sm mb-2 font-medium">Pool Liquidity</div>
-              <div className="text-sm text-[rgb(var(--muted-foreground))]">HBAR Available: 0.1790 • USDC Available: 16.00</div>
+              <div className="text-sm mb-2 font-medium">Protocol</div>
+              <div className="text-sm text-[rgb(var(--muted-foreground))]">Hub: {loans.addresses?.hub ? `${loans.addresses.hub.slice(0,6)}...${loans.addresses.hub.slice(-4)}` : 'not set'}</div>
             </div>
           </div>
 
@@ -187,14 +299,44 @@ export default function LoansPage() {
           {/* Deposit/Withdraw */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <LabeledInput label={`Deposit ${lendAsset} Amount`} placeholder="0.0" right={lendAsset} />
-              <button className="mt-3 w-full px-4 py-2 rounded-lg bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] font-medium disabled:opacity-60" disabled>
+              <LabeledInput label={`Deposit ${lendAsset} Amount`} placeholder="0.0" right={lendAsset} value={depositAmt} onChange={setDepositAmt} />
+              <button
+                className="mt-3 w-full px-4 py-2 rounded-lg bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] font-medium disabled:opacity-60"
+                disabled={!loans.ready || !tokenAddressFor.lend(lendAsset) || !depositAmt}
+                onClick={async () => {
+                  const token = tokenAddressFor.lend(lendAsset);
+                  if (!token) return;
+                  try {
+                    setStatus('Approving...');
+                    await loans.approve(token, loans.addresses!.hub, depositAmt);
+                    setStatus('Depositing...');
+                    await loans.deposit(token, depositAmt);
+                    setStatus('Deposit successful');
+                  } catch (e) {
+                    setStatus('Deposit failed');
+                  }
+                }}
+              >
                 Deposit {lendAsset}
               </button>
             </div>
             <div>
-              <LabeledInput label={`Withdraw ${lendAsset} Amount`} placeholder="0.0" right={lendAsset} />
-              <button className="mt-3 w-full px-4 py-2 rounded-lg bg-[rgb(var(--muted))]/50 border border-[rgb(var(--border))]/40 font-medium disabled:opacity-60" disabled>
+              <LabeledInput label={`Withdraw ${lendAsset} Amount`} placeholder="0.0" right={lendAsset} value={withdrawAmt} onChange={setWithdrawAmt} />
+              <button
+                className="mt-3 w-full px-4 py-2 rounded-lg bg-[rgb(var(--muted))]/50 border border-[rgb(var(--border))]/40 font-medium disabled:opacity-60"
+                disabled={!loans.ready || !tokenAddressFor.lend(lendAsset) || !withdrawAmt}
+                onClick={async () => {
+                  const token = tokenAddressFor.lend(lendAsset);
+                  if (!token) return;
+                  try {
+                    setStatus('Withdrawing...');
+                    await loans.withdraw(token, withdrawAmt);
+                    setStatus('Withdraw successful');
+                  } catch (e) {
+                    setStatus('Withdraw failed');
+                  }
+                }}
+              >
                 Withdraw {lendAsset}
               </button>
             </div>
@@ -251,7 +393,7 @@ export default function LoansPage() {
 
           {/* Borrow form */}
           <div className="space-y-4">
-            <LabeledInput label={`Borrow ${borrowAsset} Amount`} placeholder="0.0" right={borrowAsset} />
+            <LabeledInput label={`Borrow ${borrowAsset} Amount`} placeholder="0.0" right={borrowAsset} value={borrowAmt} onChange={setBorrowAmt} />
 
             <div>
               <div className="block text-sm mb-1 text-[rgb(var(--muted-foreground))]">Collateral Type</div>
@@ -267,9 +409,44 @@ export default function LoansPage() {
 
             <LabeledInput label="Required Collateral (150%)" placeholder="0.0" right={borrowAsset === "HBAR" ? "USDC" : "HBAR"} />
 
-            <button className="w-full px-4 py-2 rounded-lg bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] font-medium disabled:opacity-60" disabled>
-              Borrow 0 {borrowAsset} with 0 {borrowAsset === "HBAR" ? "USDC" : "HBAR"}
+            <button
+              className="w-full px-4 py-2 rounded-lg bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] font-medium disabled:opacity-60"
+              disabled={!loans.ready || !tokenAddressFor.borrow(borrowAsset) || !borrowAmt}
+              onClick={async () => {
+                const token = tokenAddressFor.borrow(borrowAsset);
+                if (!token) return;
+                try {
+                  setStatus('Borrowing...');
+                  await loans.borrow(token, borrowAmt);
+                  setStatus('Borrow successful');
+                } catch (e) {
+                  setStatus('Borrow failed');
+                }
+              }}
+            >
+              Borrow {borrowAmt || '0'} {borrowAsset}
             </button>
+
+            <div className="pt-2">
+              <LabeledInput label={`Repay ${borrowAsset} Amount`} placeholder="0.0" right={borrowAsset} value={repayAmt} onChange={setRepayAmt} />
+              <button
+                className="mt-3 w-full px-4 py-2 rounded-lg bg-[rgb(var(--muted))]/50 border border-[rgb(var(--border))]/40 font-medium disabled:opacity-60"
+                disabled={!loans.ready || !tokenAddressFor.borrow(borrowAsset) || !repayAmt}
+                onClick={async () => {
+                  const token = tokenAddressFor.borrow(borrowAsset);
+                  if (!token) return;
+                  try {
+                    setStatus('Repaying...');
+                    await loans.repay(token, repayAmt);
+                    setStatus('Repay successful');
+                  } catch (e) {
+                    setStatus('Repay failed');
+                  }
+                }}
+              >
+                Repay {repayAmt || '0'} {borrowAsset}
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>

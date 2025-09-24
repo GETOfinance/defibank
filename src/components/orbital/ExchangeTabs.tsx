@@ -6,7 +6,17 @@ import { ArrowsRightLeftIcon, BanknotesIcon, ChartBarIcon } from "@heroicons/rea
 import { useOrbital } from "@/hooks/useOrbital";
 import { AnalyticsDashboard } from "@/components/orbital/AnalyticsDashboard";
 
-const tokensList = ["USDC","USDT","DAI","FRAX","LUSD"] as const;
+const tokensList = ["USDC","ZAR","NGN","KES","UGX"] as const;
+const iconFor = (sym: string) => {
+  switch (sym) {
+    case 'USDC': return '/tokens/usdc.svg';
+    case 'ZAR': return '/tokens/zar.svg';
+    case 'NGN': return '/tokens/ngn.svg';
+    case 'KES': return '/tokens/kes.svg';
+    case 'UGX': return '/tokens/ugx-uganda.svg';
+    default: return undefined;
+  }
+};
 
 export default function ExchangeTabs() {
   const [tab, setTab] = useState<"swap" | "liquidity" | "analytics">("swap");
@@ -28,16 +38,19 @@ export default function ExchangeTabs() {
     window.history.replaceState({}, '', url.toString());
   }, [tab]);
   const [fromToken, setFromToken] = useState("USDC");
-  const [toToken, setToToken] = useState("USDT");
+  const [toToken, setToToken] = useState("ZAR");
   const [fromAmount, setFromAmount] = useState("");
   const orbital = useOrbital();
 
   const poolTokens = useMemo(() => tokensList.map((s) => ({ symbol: s })), []);
 
-  // Liquidity (Add) local state: only USDC and USDT rows
+  // Liquidity (Add) local state: all 5 tokens must be provided (contract requires >0 for each)
   const [addRows, setAddRows] = useState<Array<{ token: (typeof tokensList)[number]; amount: string }>>([
     { token: "USDC", amount: "" },
-    { token: "USDT", amount: "" }
+    { token: "ZAR", amount: "" },
+    { token: "NGN", amount: "" },
+    { token: "KES", amount: "" },
+    { token: "UGX", amount: "" },
   ]);
   const [kAdd, setKAdd] = useState("");
   const selectedTokens = addRows.map((r) => r.token);
@@ -78,7 +91,7 @@ export default function ExchangeTabs() {
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2 text-xs text-[rgb(var(--muted-foreground))]">
                 <span>FROM</span>
-                <span>BALANCE: 0.00</span>
+                <span>BALANCE: {(() => { const i = (tokensList as readonly string[]).indexOf(fromToken as any); return i >= 0 ? (orbital.balances[i] ?? '0') : '0'; })()}</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))]/40">
                 <input
@@ -88,6 +101,9 @@ export default function ExchangeTabs() {
                   onChange={(e) => setFromAmount(e.target.value)}
                 />
                 <div className="flex items-center gap-2">
+                  {iconFor(fromToken) && (
+                    <img src={iconFor(fromToken)!} alt={fromToken} className="w-5 h-5" />
+                  )}
                   <select
                     className="px-3 py-2 rounded-lg border border-[rgb(var(--border))]/40 bg-[rgb(var(--background))]"
                     value={fromToken}
@@ -110,7 +126,7 @@ export default function ExchangeTabs() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2 text-xs text-[rgb(var(--muted-foreground))]">
                 <span>TO</span>
-                <span>BALANCE: 0.00</span>
+                <span>BALANCE: {(() => { const i = (tokensList as readonly string[]).indexOf(toToken as any); return i >= 0 ? (orbital.balances[i] ?? '0') : '0'; })()}</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-[rgb(var(--background))] border border-[rgb(var(--border))]/40">
                 <input
@@ -125,6 +141,9 @@ export default function ExchangeTabs() {
                   })()}
                 />
                 <div className="flex items-center gap-2">
+                  {iconFor(toToken) && (
+                    <img src={iconFor(toToken)!} alt={toToken} className="w-5 h-5" />
+                  )}
                   <select
                     className="px-3 py-2 rounded-lg border border-[rgb(var(--border))]/40 bg-[rgb(var(--background))]"
                     value={toToken}
@@ -185,7 +204,11 @@ export default function ExchangeTabs() {
                 {poolTokens.map((t, i) => (
                   <div key={t.symbol as string} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-[rgb(var(--primary))]/20 flex items-center justify-center text-xs">U</div>
+                      {iconFor(t.symbol as string) ? (
+                        <img src={iconFor(t.symbol as string)!} alt={t.symbol as string} className="w-6 h-6 rounded-full" />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-[rgb(var(--primary))]/20 flex items-center justify-center text-xs">U</div>
+                      )}
                       <div>
                         <div className="font-medium text-[rgb(var(--foreground))]">{t.symbol}</div>
                       </div>
