@@ -10,18 +10,36 @@ pragma solidity ^0.8.20;
  */
 contract OrbitalMathHelperEVM {
     /**
+     * @notice Calculates the radius of a tick from its reserves
+     * @dev Returns floor(sqrt(sum(reserve_i^2))) with basic overflow guards
+     */
+    function calculateRadius(uint256[] memory reserves) external pure returns (uint256) {
+        if (reserves.length == 0) return 0;
+        unchecked {
+            uint256 sumSquares = 0;
+            for (uint256 i = 0; i < reserves.length; i++) {
+                uint256 x = reserves[i];
+                if (x != 0 && x > type(uint256).max / x) return 0; // overflow guard for x*x
+                uint256 xsq = x * x;
+                if (sumSquares > type(uint256).max - xsq) return 0; // overflow guard for sum
+                sumSquares += xsq;
+            }
+            return _sqrt(sumSquares);
+        }
+    }
+
+    /**
+     * @notice Calculates the s value for a boundary tick
+     * @dev Simple approximation: use radius as s (kept for ABI compatibility)
+     */
+    function calculateBoundaryTickS(uint256 r, uint256 /*k*/ ) external pure returns (uint256) {
+        return r;
+    }
+
+    /**
      * @notice Solves the (approximate) invariant to calculate swap output amount
      * @dev ABI must match exactly the signature used by OrbitalPool low-level call
      *      Unused parameters are kept for ABI compatibility and future extensions.
-     * @param sum_interior_reserves Unused in this EVM scaffold (kept for ABI)
-     * @param interior_consolidated_radius Unused in this EVM scaffold (kept for ABI)
-     * @param boundary_consolidated_radius Unused in this EVM scaffold (kept for ABI)
-     * @param boundary_total_k_bound Unused in this EVM scaffold (kept for ABI)
-     * @param total_reserves Current total reserves across all tokens
-     * @param token_in_index Index of the input token
-     * @param token_out_index Index of the output token
-     * @param amount_in_after_fee Input amount after fee deduction
-     * @return The computed output amount (0 if not solvable)
      */
     function solveTorusInvariant(
         uint256 sum_interior_reserves,
@@ -48,15 +66,12 @@ contract OrbitalMathHelperEVM {
 
         if (dx == 0 || rIn == 0 || rOut == 0) return 0;
 
-        // Spherical invariant approximation:
-        // Preserve K = ||r||^2 while increasing rIn by dx and decreasing rOut by dy
-        // Derived 2*rIn*dx + dx^2 = 2*rOut*dy - dy^2  =>  dy = rOut - sqrt(rOut^2 - (2*rIn*dx + dx^2))
-        // All calculations guarded against overflow; returns 0 if unsafe.
+        // Preserve K = ||r||^2 while increasing rIn by dx and decreasing rOut by dy:
+        // 2*rIn*dx + dx^2 = 2*rOut*dy - dy^2  =>  dy = rOut - sqrt(rOut^2 - (2*rIn*dx + dx^2))
 
         // Compute rOut^2 with overflow guard
         uint256 rOutSquared;
         unchecked {
-            // Check for overflow: rOut * rOut overflows if rOut > max / rOut
             if (rOut != 0 && rOut > type(uint256).max / rOut) return 0;
             rOutSquared = rOut * rOut;
         }
