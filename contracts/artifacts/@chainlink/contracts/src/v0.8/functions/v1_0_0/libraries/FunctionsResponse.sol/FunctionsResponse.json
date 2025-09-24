@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "FunctionsResponse",
+  "sourceName": "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsResponse.sol",
+  "abi": [],
+  "bytecode": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea2646970667358221220bdb72917b6ad79f59e5257b5b6295b32cd89d6df8b51005c3fc730e2310588bd64736f6c634300081e0033",
+  "deployedBytecode": "0x600080fdfea2646970667358221220bdb72917b6ad79f59e5257b5b6295b32cd89d6df8b51005c3fc730e2310588bd64736f6c634300081e0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
