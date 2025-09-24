@@ -1,4 +1,5 @@
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
+const { ethers } = hre;
 const fs = require("fs");
 const path = require("path");
 
@@ -17,7 +18,7 @@ async function main() {
   if (chainId === 296) {
     contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_296;
     console.log("🌐 Hedera Testnet Configuration");
-
+  }
 
   if (!contractAddress || contractAddress === '0x0000000000000000000000000000000000000000') {
     console.log("❌ Contract address not found in environment variables");

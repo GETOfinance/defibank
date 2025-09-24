@@ -3,7 +3,13 @@ require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.30",
+  solidity: {
+    version: "0.8.30",
+    settings: {
+      optimizer: { enabled: true, runs: 200 },
+      viaIR: true,
+    },
+  },
   networks: {
     // Hedera Testnet Configuration
     hederaTestnet: {
@@ -13,7 +19,6 @@ module.exports = {
       gas: 3000000,
       gasPrice: 400000000000, // 400 gwei (Hashio min ~380 gwei)
     },
-
   },
   etherscan: {
     apiKey: {
@@ -28,7 +33,6 @@ module.exports = {
           browserURL: "https://hashscan.io/testnet"
         }
       },
-
     ]
   }
 };

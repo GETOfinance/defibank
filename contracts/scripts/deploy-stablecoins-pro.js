@@ -8,8 +8,8 @@ async function main() {
   console.log('Deployer:', deployer.address);
 
   // External config (set these appropriately)
-  const USDT_ADDRESS = process.env.HEDERA_USDT_ADDRESS_296; // e.g., a USDT-like token on Hedera Testnet
-  if (!USDT_ADDRESS) throw new Error('HEDERA_USDT_ADDRESS_296 missing in .env');
+  const USDT_ADDRESS = process.env.HEDERA_USDC_ADDRESS_296 || process.env.HEDERA_USDT_ADDRESS_296; // prefer USDC env, fallback to old USDT key
+  if (!USDT_ADDRESS) throw new Error('HEDERA_USDC_ADDRESS_296 missing in .env');
 
   // Symbols list
   const symbols = ['NGN','KES','GHS','ZAR','UGX','TZS','MAD','EGP','XOF','XAF','ETB','RWF','ZMW','MZN','NAD','BWP','BIF','CDF','AOA','DZD','TND','LYD','SDG','SOS','SLL','GMD','LRD','MGA','GNF','DJF','ERN','KMF','ZWL','SSP','SCR','SZL','LSL','MUR','CVE'];
@@ -42,7 +42,7 @@ async function main() {
   const lines = [
     `NEXT_PUBLIC_STABLECOINS_ADDRESS_${chainId}=${stableAddress}\n`,
     `NEXT_PUBLIC_STABLECOINS_ORACLE_${chainId}=${oracleAddress}\n`,
-    `NEXT_PUBLIC_USDT_ADDRESS_${chainId}=${USDT_ADDRESS}\n`
+    `NEXT_PUBLIC_USDC_ADDRESS_${chainId}=${USDT_ADDRESS}\n`
   ];
   try {
     fs.appendFileSync(rootEnvPath, lines.join(''), { encoding: 'utf8' });

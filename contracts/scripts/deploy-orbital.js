@@ -11,10 +11,10 @@ async function main() {
   const MockUSDC = await hre.ethers.getContractFactory("MockUSDC");
   const tokensMeta = [
     ["USD Coin", "USDC"],
-    ["Tether USD", "USDT"],
-    ["Dai Stablecoin", "DAI"],
-    ["Frax", "FRAX"],
-    ["Liquity USD", "LUSD"],
+    ["South African Rand", "ZAR"],
+    ["Nigerian Naira", "NGN"],
+    ["Kenyan Shilling", "KES"],
+    ["Ugandan Shilling", "UGX"],
   ];
 
   const tokenContracts = [];
