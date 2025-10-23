@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowsRightLeftIcon, BanknotesIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { useOrbital } from "@/hooks/useOrbital";
+import { toBaseUnits } from "@/utils/orbital/client";
 import { AnalyticsDashboard } from "@/components/orbital/AnalyticsDashboard";
 
 const tokensList = ["USDC","ZAR","NGN","KES","UGX"] as const;
@@ -54,6 +55,11 @@ export default function ExchangeTabs() {
   ]);
   const [kAdd, setKAdd] = useState("");
   const selectedTokens = addRows.map((r) => r.token);
+  const [kInfo, setKInfo] = useState<null | { k: bigint; lowerBound: bigint; upperBound: bigint; reserveConstraint: bigint }>(null)
+  const [kError, setKError] = useState<string>('')
+  const [kLoading, setKLoading] = useState<boolean>(false)
+
+  const [lastSuggestSig, setLastSuggestSig] = useState<string>("");
 
   return (
     <div className="space-y-6">
@@ -170,7 +176,7 @@ export default function ExchangeTabs() {
                 className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] font-medium disabled:opacity-50"
                 disabled={!fromAmount || fromToken === toToken || !orbital.ready}
               >
-                APPROVE {fromToken}
+                Approve
               </button>
 
               <button
@@ -258,28 +264,161 @@ export default function ExchangeTabs() {
                       className="w-full min-w-0 px-2 py-1.5 h-9 text-sm rounded-md border border-[rgb(var(--border))]/40 bg-[rgb(var(--background))]"
                       placeholder="0.0"
                       value={row.amount}
-                      onChange={(e) => setAddRows((prev) => prev.map((r, i) => (i === idx ? { ...r, amount: e.target.value } : r)))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAddRows((prev) => {
+                          if (row.token === 'USDC') {
+                            const usdc = val;
+                            const usdcNum = usdc === '' ? NaN : Number(usdc);
+                            const fmt = (x: number) => {
+                              if (!isFinite(x)) return '';
+                              const s = x.toFixed(6);
+                              return s.replace(/\.?0+$/, '');
+                            };
+                            return prev.map((r) => {
+                              if (r.token === 'USDC') return { ...r, amount: val };
+                              if (r.token === 'ZAR') return { ...r, amount: usdc === '' ? '' : fmt(usdcNum * 18.5) };
+                              if (r.token === 'NGN') return { ...r, amount: usdc === '' ? '' : fmt(usdcNum * 1600) };
+                              if (r.token === 'KES') return { ...r, amount: usdc === '' ? '' : fmt(usdcNum * 130) };
+                              if (r.token === 'UGX') return { ...r, amount: usdc === '' ? '' : fmt(usdcNum * 3800) };
+                              return r;
+                            });
+                          }
+                          return prev.map((r, i) => (i === idx ? { ...r, amount: val } : r));
+                        });
+                      }}
                     />
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <input
                   className="w-full max-w-xs px-2 py-1.5 h-9 text-sm rounded-md border border-[rgb(var(--border))]/40 bg-[rgb(var(--background))]"
                   placeholder="Tick k"
                   value={kAdd}
-                  onChange={(e) => setKAdd(e.target.value)}
+                  onChange={(e) => { setKAdd(e.target.value); setKError(''); }}
                 />
                 <button
                   onClick={async () => {
+                    setKError(''); setKLoading(true);
                     const payload = Object.fromEntries(addRows.map((r) => [r.token, r.amount || '0']));
-                    try { await orbital.addLiquidity(kAdd, payload as any); } catch (e) { console.error(e); }
+
+                    // Lightweight client-side numeric validation before calling suggestK
+                    const invalid = addRows.find((r) => r.amount !== '' && !/^\d*(?:\.\d*)?$/.test(r.amount));
+                    if (invalid) {
+                      setKError(`Invalid amount format for ${invalid.token}: "${invalid.amount}"`);
+                      setKLoading(false);
+                      return;
+                    }
+
+                    try {
+                      const info = await orbital.suggestK(payload as any);
+                      setKInfo(info);
+                      setLastSuggestSig(JSON.stringify(payload));
+                    } catch (e: any) {
+                      console.error(e);
+                      const msg = (e && e.message) ? e.message : 'Failed to suggest k.';
+                      setKError(msg);
+                    } finally {
+                      setKLoading(false);
+                    }
+                  }}
+                  className="px-3 py-2 text-sm rounded-md bg-[rgb(var(--muted))] text-[rgb(var(--foreground))] disabled:opacity-50"
+                  disabled={!orbital.ready || kLoading}
+                >
+                  {kLoading ? 'Suggesting…' : 'Suggest k'}
+                </button>
+                {kInfo && (
+                  <span className="text-xs text-[rgb(var(--muted-foreground))]">Suggested: {kInfo.k.toString()}</span>
+                )}
+                <button
+                  onClick={async () => {
+                    const payload = Object.fromEntries(addRows.map((r) => [r.token, r.amount || '0']));
+
+                    // Lightweight numeric validation and positivity check
+                    const invalid = addRows.find((r) => r.amount === '' || !/^\d*(?:\.\d*)?$/.test(r.amount));
+                    if (invalid) { setKError(`Invalid amount format for ${invalid.token}: "${invalid.amount || ''}"`); return; }
+
+                    const allPositive = Object.values(payload).every((v: any) => Number(v) > 0);
+                    if (!allPositive) { setKError('All five token amounts must be > 0.'); return; }
+
+                    // If relying on suggested k and inputs changed since last suggest, recompute
+                    let effectiveKInfo = kInfo;
+                    const sig = JSON.stringify(payload);
+                    if (!kAdd && (!kInfo || lastSuggestSig !== sig)) {
+                      try {
+                        setKLoading(true);
+                        const info = await orbital.suggestK(payload as any);
+                        setKInfo(info);
+                        setLastSuggestSig(sig);
+                        effectiveKInfo = info;
+                      } catch (e: any) {
+                        console.error(e);
+                        const msg = (e && e.message) ? e.message : 'Failed to suggest k.';
+                        setKError(msg);
+                        setKLoading(false);
+                        return;
+                      } finally {
+                        setKLoading(false);
+                      }
+                    }
+
+                    // Validate k (either user-provided or suggested)
+                    const useK = kAdd || (effectiveKInfo ? effectiveKInfo.k.toString() : '');
+                    const validation = orbital.validateK(useK, effectiveKInfo || undefined);
+                    if (!validation.valid) { setKError(validation.reason); return; }
+
+                    // Proactively detect missing allowances and prompt Approve with exact amounts
+                    try {
+                      const needed: Array<{ sym: string; amount: string; idx: number }> = [];
+                      for (let i = 0; i < tokensList.length; i++) {
+                        const sym = tokensList[i];
+                        const dec = orbital.decimals?.[i] ?? 18;
+                        const requiredBN = toBaseUnits(String(payload[sym] || '0'), dec);
+                        const allowanceStr = orbital.allowances?.[i] ?? '0';
+                        const allowanceBN = toBaseUnits(allowanceStr, dec);
+                        if (allowanceBN.lt(requiredBN)) {
+                          needed.push({ sym, amount: String(payload[sym] || '0'), idx: i });
+                        }
+                      }
+
+                      if (needed.length > 0) {
+                        const list = needed.map(n => `${n.sym}: ${n.amount}`).join('\n');
+                        const ok = typeof window !== 'undefined' ? window.confirm(`Approve needed before adding liquidity:\n\n${list}\n\nProceed to send approvals?`) : false;
+                        if (!ok) { setKError('Approvals required were not granted.'); return; }
+                        for (const n of needed) {
+                          await orbital.approve(n.sym as any, n.amount);
+                        }
+                      }
+                    } catch (e: any) {
+                      console.error(e);
+                      const msg = (e && e.message) ? e.message : 'Failed to prepare approvals.';
+                      setKError(msg);
+                      return;
+                    }
+
+                    setKError('');
+                    try {
+                      await orbital.addLiquidity(useK, payload as any);
+                    } catch (e: any) {
+                      console.error(e);
+                      const msg = (e && e.message) ? e.message : 'addLiquidity failed.';
+                      setKError(msg);
+                    }
                   }}
                   className="px-3 py-2 text-sm rounded-md bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))]"
                   disabled={!orbital.ready}
                 >
                   Add
                 </button>
+                {kInfo && (
+                  <div className="w-full text-xs text-[rgb(var(--muted-foreground))] mt-2">
+                    Suggested k: {kInfo.k.toString()} | Bounds: [{kInfo.lowerBound.toString()} , {kInfo.upperBound.toString()}], constraint ≥ {kInfo.reserveConstraint.toString()}
+                  </div>
+                )}
+                {kError && (
+                  <div className="w-full text-xs text-red-500 mt-1">{kError}</div>
+                )}
               </div>
             </div>
 

@@ -146,74 +146,7 @@ export function AnalyticsDashboard() {
         </motion.div>
       </div>
 
-      {/* Secondary Chart */}
-      <div className="grid grid-cols-1 gap-6">
-        <AdvancedChart title="Trading Performance & Volume Analysis" showMetricSelector={true} />
-      </div>
 
-      {/* Secondary Analytics - keep mock summaries for now */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="glass-morphism-dark rounded-2xl p-6 border border-orange-500/20">
-          <h3 className="text-lg font-bold text-orange-300 mb-4 flex items-center gap-2">
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 6, repeat: Infinity, ease: "linear" }}>
-              <PieChart className="w-5 h-5 text-orange-400" />
-            </motion.div>
-            Pool Distribution
-          </h3>
-          <div className="space-y-4">
-            {['USDC','USDT','DAI','FRAX','LUSD'].map((token, index) => (
-              <motion.div key={token} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + index * 0.1 }} className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-orange-500/5 to-amber-500/5 border border-orange-500/20">
-                <div className="flex items-center gap-3">
-                  <motion.div className="w-4 h-4 rounded-full bg-orange-400" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }} />
-                  <span className="font-semibold text-orange-200">{token}</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold text-orange-100">—</div>
-                  <div className="text-xs text-orange-400/70">—</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-morphism-dark rounded-2xl p-6 border border-orange-500/20">
-          <h3 className="text-lg font-bold text-orange-300 mb-4 flex items-center gap-2">
-            <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-              <TrendingUp className="w-5 h-5 text-green-400" />
-            </motion.div>
-            Top Performers
-          </h3>
-          <div className="space-y-3">
-            {[
-              { pair: 'USDC/USDT', apy: '—', efficiency: '—', volume: '—' },
-              { pair: 'DAI/FRAX', apy: '—', efficiency: '—', volume: '—' },
-              { pair: 'USDT/DAI', apy: '—', efficiency: '—', volume: '—' },
-              { pair: 'FRAX/LUSD', apy: '—', efficiency: '—', volume: '—' }
-            ].map((performer, index) => (
-              <motion.div key={performer.pair} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 + index * 0.1 }} className="p-3 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold text-green-200">{performer.pair}</span>
-                  <span className="text-sm text-green-400 font-bold">{performer.apy}</span>
-                </div>
-                <div className="flex justify-between text-xs text-green-300/70">
-                  <span>Efficiency: {performer.efficiency}</span>
-                  <span>Volume: {performer.volume}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }} className="glass-morphism-dark rounded-2xl p-6 border border-orange-500/20">
-          <h3 className="text-lg font-bold text-orange-300 mb-4 flex items-center gap-2">
-            <motion.div animate={{ rotate: [0, 180, 360] }} transition={{ duration: 3, repeat: Infinity }}>
-              <Activity className="w-5 h-5 text-blue-400" />
-            </motion.div>
-            Recent Activity
-          </h3>
-          <div className="text-sm text-orange-300/70">Live event feed coming soon…</div>
-        </motion.div>
-      </div>
     </div>
   )
 }

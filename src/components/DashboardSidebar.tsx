@@ -19,6 +19,7 @@ import {
   CurrencyDollarIcon,
   ArrowsRightLeftIcon,
   BuildingLibraryIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline'
 import { useAccount, useDisconnect } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
@@ -33,6 +34,7 @@ const navItems = [
   { href: '/dashboard/stablecoins', label: 'StableCoins', icon: <CurrencyDollarIcon className="w-5 h-5" /> },
   { href: '/dashboard/exchange', label: 'Exchange', icon: <ArrowsRightLeftIcon className="w-5 h-5" /> },
   { href: '/dashboard/loans', label: 'Loans', icon: <BuildingLibraryIcon className="w-5 h-5" /> },
+  { href: '/dashboard/escrow', label: 'Escrow', icon: <ShieldCheckIcon className="w-5 h-5" /> },
   { href: '/dashboard/faucet', label: 'Faucet', icon: <BanknotesIcon className="w-5 h-5" /> },
 ]
 
