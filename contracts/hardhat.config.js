@@ -17,7 +17,7 @@ module.exports = {
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 296,
       gas: 3000000,
-      gasPrice: 400000000000, // 400 gwei (Hashio min ~380 gwei)
+      gasPrice: Number(process.env.HEDERA_GAS_PRICE || 0) || 420000000000, // default 420 gwei (Hashio min ~420 gwei)
     },
   },
   etherscan: {
