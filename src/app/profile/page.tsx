@@ -629,7 +629,7 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center space-y-2">
                 <h1 className="text-4xl md:text-5xl font-bold">
                   <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
-                    @{registeredUsername}
+                    {registeredUsername?.startsWith('@') ? registeredUsername : '@' + registeredUsername}
                   </span>
                 </h1>
                 <div className="inline-flex items-center space-x-2 bg-black/30 px-3 py-1.5 rounded-lg text-gray-400 text-sm">

@@ -164,7 +164,7 @@ export default function ExchangePage() {
               </div>
               <div className="p-3 rounded-xl bg-[rgb(var(--muted))]/10 border border-[rgb(var(--border))]/40">
                 <div className="text-xs uppercase opacity-70">Gas Estimation</div>
-                <div className="font-semibold">80K + 15K×complexity</div>
+                <div className="font-semibold">USD 0.01 Only</div>
               </div>
               <div className="p-3 rounded-xl bg-[rgb(var(--muted))]/10 border border-[rgb(var(--border))]/40">
                 <div className="text-xs uppercase opacity-70">Supported Tokens</div>

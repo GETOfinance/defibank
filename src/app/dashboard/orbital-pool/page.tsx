@@ -403,7 +403,7 @@ export default function OrbitalPoolPage() {
           <Spec label="Precision" value="10¹⁸ (18 decimals)" />
           <Spec label="Square Root Method" value="Newton's Method" />
           <Spec label="Max Efficiency" value="1000x Capital" />
-          <Spec label="Gas Estimation" value="80K + 15K×complexity" />
+          <Spec label="Gas Estimation" value="USD 0.01 Only" />
           <Spec label="Supported Tokens" value="n-dimensional" />
         </div>
       </motion.div>

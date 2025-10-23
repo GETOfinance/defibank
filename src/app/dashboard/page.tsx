@@ -311,7 +311,7 @@ export default function DashboardPage() {
                 </div>
                 {username ? (
                   <div className="text-sm text-[rgb(var(--muted-foreground))] mt-1">
-                    Username: <span className="text-[rgb(var(--primary))]">@{username}</span>
+                    Username: <span className="text-[rgb(var(--primary))]">{username?.startsWith('@') ? username : '@' + username}</span>
                   </div>
                 ) : (
                   <motion.button

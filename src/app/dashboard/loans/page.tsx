@@ -13,6 +13,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { useLoans } from "@/hooks/useLoans";
 import { getOrbitalAddressesByChainId } from "@/utils/orbital/client";
+import { getUsdcAddress } from "@/utils/erc20Client";
+import { ethers } from "ethers";
+import { getERC20 } from "@/utils/loans/client";
+
+
 
 // Compact stat tile
 function StatTile({ label, value, tone = "default" }: { label: string; value: string; tone?: "default" | "success" | "danger" }) {
@@ -50,7 +55,7 @@ function LabeledInput({ label, placeholder, right, value, onChange }: { label: s
   );
 }
 
-function LiveReadouts({ usdcAddress }: { usdcAddress?: string }) {
+function LiveReadouts({ usdcAddress, refreshKey }: { usdcAddress?: string; refreshKey?: number }) {
   const { address } = useAccount();
   const loans = useLoans();
   const [stats, setStats] = useState<{ totalDeposits: string; totalBorrowed: string; protocolFees: string; utilizationRate: string } | null>(null);
@@ -67,7 +72,7 @@ function LiveReadouts({ usdcAddress }: { usdcAddress?: string }) {
         }
       } catch {}
     })();
-  }, [loans, address]);
+  }, [loans, address, refreshKey]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -114,11 +119,19 @@ export default function LoansPage() {
   const [repayAmt, setRepayAmt] = useState("");
   const [status, setStatus] = useState<string>("");
   const [usdcDeposit, setUsdcDeposit] = useState("0");
+  const [walletUsdc, setWalletUsdc] = useState("0");
+  const [walletHbar, setWalletHbar] = useState("0");
+
   const [usdcDebt, setUsdcDebt] = useState("0");
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const usdcAddress = useMemo(() => {
     const cid = loans.chainId || chain?.id;
     if (!cid) return undefined;
+    // Prefer explicit NEXT_PUBLIC_USDC_ADDRESS_<chainId>, fallback to Orbital token[0]
+    const explicit = getUsdcAddress(cid);
+    if (explicit) return explicit;
     const orbital = getOrbitalAddressesByChainId(cid);
     return orbital?.tokens?.[0];
   }, [loans.chainId, chain?.id]);
@@ -153,6 +166,45 @@ export default function LoansPage() {
     })();
   }, [address, usdcAddress, loans]);
 
+  // Helper: refresh USDC deposit/debt after transactions
+  const refreshUsdc = async () => {
+    if (!address || !usdcAddress) return;
+    try {
+      const [dep, debt] = await Promise.all([
+        loans.getUserDeposits(address, usdcAddress),
+        loans.getUserBorrowed(address, usdcAddress),
+      ]);
+      setUsdcDeposit(dep);
+      setUsdcDebt(debt);
+    } catch {}
+  };
+
+  // Helper: refresh wallet ERC-20 balances (USDC, HBAR wrapper)
+  const refreshWalletBalances = async () => {
+    if (typeof window === 'undefined') return;
+    if (!address) return;
+    try {
+      const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+      if (usdcAddress) {
+        const erc = getERC20(usdcAddress, provider);
+        const dec = await erc.decimals().catch(() => 18);
+        const bal = await erc.balanceOf(address).catch(() => 0);
+        setWalletUsdc(ethers.utils.formatUnits(bal, dec));
+      }
+      if (hbarErc20) {
+        const erc = getERC20(hbarErc20, provider);
+        const dec = await erc.decimals().catch(() => 18);
+        const bal = await erc.balanceOf(address).catch(() => 0);
+        setWalletHbar(ethers.utils.formatUnits(bal, dec));
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    refreshWalletBalances();
+  }, [address, usdcAddress, hbarErc20]);
+
+
   const poolStats = useMemo(
     () => ({
       HBAR: { liquidity: "0.1790 HBAR", util: "17.41%", lendAPY: "5.00%", borrowAPY: "8.00%" },
@@ -179,10 +231,11 @@ export default function LoansPage() {
     );
   }
 
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Live data */}
-      <LiveReadouts usdcAddress={usdcAddress} />
+      <LiveReadouts usdcAddress={usdcAddress} refreshKey={refreshKey} />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -200,6 +253,17 @@ export default function LoansPage() {
       )}
 
 
+      {/* Wallet Balances */}
+      <div className="grid grid-cols-1 gap-4">
+        <div className="rounded-xl p-4 border border-[rgb(var(--border))]/40 bg-[rgb(var(--card))]/60">
+          <div className="text-sm mb-2 font-medium">Wallet Balances</div>
+          <div className="text-sm text-[rgb(var(--muted-foreground))] flex gap-6">
+            <span>HBAR (wrapper): {walletHbar}</span>
+            <span>USDC: {walletUsdc}</span>
+          </div>
+        </div>
+      </div>
+
       {/* Pool Statistics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* HBAR Pool */}
@@ -208,6 +272,7 @@ export default function LoansPage() {
             <div className="p-2 rounded-lg bg-blue-500/10">
               <ChartBarIcon className="w-5 h-5 text-blue-400" />
             </div>
+
             <h3 className="font-semibold">HBAR Pool Statistics</h3>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -312,6 +377,9 @@ export default function LoansPage() {
                     setStatus('Depositing...');
                     await loans.deposit(token, depositAmt);
                     setStatus('Deposit successful');
+                    setRefreshKey((k) => k + 1);
+                    await refreshUsdc();
+                    await refreshWalletBalances();
                   } catch (e) {
                     setStatus('Deposit failed');
                   }
@@ -332,6 +400,9 @@ export default function LoansPage() {
                     setStatus('Withdrawing...');
                     await loans.withdraw(token, withdrawAmt);
                     setStatus('Withdraw successful');
+                    setRefreshKey((k) => k + 1);
+                    await refreshUsdc();
+                    await refreshWalletBalances();
                   } catch (e) {
                     setStatus('Withdraw failed');
                   }
@@ -419,6 +490,9 @@ export default function LoansPage() {
                   setStatus('Borrowing...');
                   await loans.borrow(token, borrowAmt);
                   setStatus('Borrow successful');
+                  setRefreshKey((k) => k + 1);
+                  await refreshUsdc();
+                  await refreshWalletBalances();
                 } catch (e) {
                   setStatus('Borrow failed');
                 }
@@ -436,9 +510,14 @@ export default function LoansPage() {
                   const token = tokenAddressFor.borrow(borrowAsset);
                   if (!token) return;
                   try {
+                    setStatus('Approving...');
+                    await loans.approve(token, loans.addresses!.hub, repayAmt);
                     setStatus('Repaying...');
                     await loans.repay(token, repayAmt);
                     setStatus('Repay successful');
+                    setRefreshKey((k) => k + 1);
+                    await refreshUsdc();
+                    await refreshWalletBalances();
                   } catch (e) {
                     setStatus('Repay failed');
                   }

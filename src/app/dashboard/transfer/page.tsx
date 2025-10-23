@@ -17,7 +17,7 @@ import {
   ChatBubbleBottomCenterTextIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+
 import { useAccount } from 'wagmi'
 import { useWallet } from '@/context/WalletContext'
 import { 
@@ -401,7 +401,7 @@ export default function TransferPage() {
           <p className="text-[rgb(var(--muted-foreground))] mb-4">
             Please connect your wallet to send or manage transfers.
           </p>
-          <ConnectButton />
+
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

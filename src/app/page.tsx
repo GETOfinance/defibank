@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, Variants, useAnimation, useInView } from 'framer-motion';
-import { 
-  ShieldCheckIcon, CurrencyDollarIcon, UserCircleIcon, 
-  ArrowPathIcon, CheckCircleIcon, 
+import {
+  ShieldCheckIcon, CurrencyDollarIcon, UserCircleIcon,
+  ArrowPathIcon, CheckCircleIcon,
   BanknotesIcon, UsersIcon, SparklesIcon,
   ChartBarIcon, WalletIcon, FireIcon,
-  QrCodeIcon, DevicePhoneMobileIcon, 
+  QrCodeIcon, DevicePhoneMobileIcon,
   ArrowRightIcon, ScissorsIcon,
   SunIcon, MoonIcon
 } from '@heroicons/react/24/outline';
@@ -19,11 +19,11 @@ import { useChain } from '@/hooks/useChain';
 // Animation variants
 const fadeIn = {
   initial: { opacity: 0, y: 20, scale: 0.98 },
-  animate: { 
-    opacity: 1, 
-    y: 0, 
+  animate: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1] } 
+    transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1] }
   }
 };
 
@@ -37,13 +37,13 @@ const stagger = {
 
 const iconFloat = {
   initial: { y: 0 },
-  animate: { 
+  animate: {
     y: [-5, 5, -5],
-    transition: { 
+    transition: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut" 
-    } 
+      ease: "easeInOut"
+    }
   }
 };
 
@@ -79,7 +79,7 @@ const ThemeToggle = () => {
         >
           <SunIcon className="w-6 h-6" />
         </motion.div>
-        
+
         <motion.div
           initial={{ scale: isDarkMode ? 0 : 1 }}
           animate={{ scale: isDarkMode ? 0 : 1, rotate: isDarkMode ? -180 : 0 }}
@@ -142,7 +142,7 @@ const Hero = () => {
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const { chainId, nativeToken } = useChain();
-  
+
   return (
     <motion.section
       className="relative min-h-[100vh] flex items-center justify-center text-center overflow-hidden px-4"
@@ -153,7 +153,7 @@ const Hero = () => {
       <FloatingObjects />
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] pointer-events-none opacity-30 dark:opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-black dark:via-orange-950/30 dark:to-black" />
-      
+
       <motion.div style={{ y, opacity }} className="relative z-10 w-full max-w-6xl mx-auto">
         <motion.div
           className="mb-8 inline-block"
@@ -166,7 +166,7 @@ const Hero = () => {
           </div>
         </motion.div>
 
-        <motion.h1 
+        <motion.h1
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight"
           variants={fadeIn}
         >
@@ -175,14 +175,14 @@ const Hero = () => {
           </span>
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           className="text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-8 md:mb-12 text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-light px-4"
           variants={fadeIn}
         >
-          Smart, Secure Crypto Transfers With Built-in Escrow Protection
+          Secure and Protected Transfers, Group Payments, Savings, African Stablecoins mint/burn, revolutionary Stablecoins DEX, Loans, and Transaction history
         </motion.p>
 
-        <motion.div 
+        <motion.div
           className="flex justify-center px-4"
           variants={fadeIn}
         >
@@ -193,7 +193,7 @@ const Hero = () => {
           </Link>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="mt-8 md:mt-16 flex justify-center gap-8 md:gap-16 flex-wrap px-4"
           variants={fadeIn}
         >
@@ -202,7 +202,7 @@ const Hero = () => {
             { icon: QrCodeIcon, text: "QR Scan & Pay" },
             { icon: ScissorsIcon, text: "Split Bills Easily" }
           ].map((item, i) => (
-            <motion.div 
+            <motion.div
               key={i}
               className="flex items-center space-x-2 md:space-x-3 text-sm md:text-base text-gray-600 dark:text-gray-400 group"
               whileHover={{ scale: 1.05 }}
@@ -240,8 +240,8 @@ const Navbar = () => {
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 px-4 transition-all duration-300 ${
-        scrolled 
-          ? 'py-3 bg-white/80 dark:bg-black/80 backdrop-blur-lg shadow-md' 
+        scrolled
+          ? 'py-3 bg-white/80 dark:bg-black/80 backdrop-blur-lg shadow-md'
           : 'py-5 bg-transparent'
       }`}
       initial={{ y: -100, opacity: 0 }}
@@ -259,8 +259,8 @@ const Navbar = () => {
 
         {/* Launch app and theme toggle on the right */}
         <div className="flex items-center space-x-4">
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-lg flex items-center space-x-1 transition-colors"
           >
             <span>Launch App</span>
@@ -340,7 +340,7 @@ const ChainSlider = () => {
           ))}
         </div>
       </div>
-      
+
       <style jsx>{`
         .slider-container {
           position: relative;
@@ -348,7 +348,7 @@ const ChainSlider = () => {
           padding: 20px 0;
           width: 100%;
         }
-        
+
         .slider-container::before,
         .slider-container::after {
           content: '';
@@ -359,34 +359,34 @@ const ChainSlider = () => {
           z-index: 2;
           pointer-events: none;
         }
-        
+
         .slider-container::before {
           left: 0;
           background: linear-gradient(to right, var(--slider-bg-start), var(--slider-bg-end));
         }
-        
+
         .slider-container::after {
           right: 0;
           background: linear-gradient(to left, var(--slider-bg-start), var(--slider-bg-end));
         }
-        
+
         .slider {
           display: flex;
           animation: scroll 60s linear infinite;
           width: fit-content;
         }
-        
+
         .slider-container:hover .slider {
           animation-play-state: paused;
         }
-        
+
         .slide {
           flex: 0 0 auto;
           width: 140px;
           box-sizing: border-box;
           padding: 0 10px;
         }
-        
+
         .logo-wrapper {
           display: flex;
           flex-direction: column;
@@ -401,20 +401,20 @@ const ChainSlider = () => {
           cursor: pointer;
           height: 120px;
         }
-        
+
         .logo-wrapper:hover {
           border-color: rgba(74, 222, 128, 0.4);
           transform: translateY(-5px);
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .logo-image {
           width: 60px;
           height: 60px;
           object-fit: contain;
           filter: var(--logo-filter);
         }
-        
+
         .logo-name {
           margin-top: 8px;
           font-size: 14px;
@@ -422,7 +422,7 @@ const ChainSlider = () => {
           color: #6b7280;
           transition: all 0.3s ease;
         }
-        
+
         @keyframes scroll {
           0% {
             transform: translateX(0);
@@ -444,13 +444,127 @@ const ChainSlider = () => {
           --logo-filter: invert(1);
         }
       `}</style>
+
     </section>
   );
 };
 
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any, info: any) {
+    // eslint-disable-next-line no-console
+    console.error('FeatureIntros crashed', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="rounded-2xl border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 p-6">
+              <p className="text-red-700 dark:text-red-300 font-medium">Feature section failed to load. Please refresh the page.</p>
+            </div>
+          </div>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+
+const FeatureIntros = () => {
+  return (
+    <section id="intros" className="py-16 md:py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-black dark:via-orange-950/10 dark:to-black" />
+      <div className="container mx-auto px-4 relative z-10 space-y-20">
+        {/* Intro 1: Orbital Exchange */}
+        <motion.div variants={fadeIn} initial="initial" whileInView="animate" viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-transparent bg-clip-text">
+                Exchange
+              </span>
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
+              Exchange Orbital is an automated market maker for pools of stablecoins, unlocks capital efficiency by bringing concentrated liquidity to higher dimensions with AMM using spherical geometry and orbital mechanics.
+            </p>
+
+          </div>
+          <div className="order-first lg:order-last">
+            <div className="h-full w-full rounded-3xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent p-8 flex items-center justify-center">
+              <div className="text-center max-w-md">
+                <div className="text-7xl">🌀</div>
+                <p className="mt-4 text-gray-500 dark:text-gray-400">Torus-shaped liquidity. Multi-dimensional stability.</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Intro 2: Loans */}
+        <motion.div variants={fadeIn} initial="initial" whileInView="animate" viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-transparent bg-clip-text">
+                Loans
+              </span>
+            </h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">Multi-Asset Lending and Borrowing</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Supply assets to earn yield and borrow against your collateral with a clean, wallet-gated UX. Built to support cross-collateral strategies and multiple assets.
+            </p>
+          </div>
+          <div>
+            <div className="rounded-3xl border border-orange-500/20 p-8 bg-white/40 dark:bg-black/30 backdrop-blur-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-6xl">🏦</div>
+                <p className="mt-4 text-gray-500 dark:text-gray-400">Deposit, withdraw, and borrow — intuitively.</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Intro 3: StableCoins */}
+        <motion.div variants={fadeIn} initial="initial" whileInView="animate" viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 text-transparent bg-clip-text">
+                StableCoins
+              </span>
+            </h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 mb-6">
+              Mint and burn African currency stablecoins using USDC oracle prices.
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Seamless UX for remittances and FX with a built-in oracle. Configured on-chain contracts to go live.
+            </p>
+          </div>
+          <div>
+            <div className="rounded-3xl border border-orange-500/20 p-8 bg-gradient-to-br from-orange-500/10 to-transparent flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-6xl">💱</div>
+                <p className="mt-4 text-gray-500 dark:text-gray-400">Local currencies. Global rails.</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+
 const TransferHighlight = () => {
   const { nativeToken } = useChain();
-  
+
   return (
     <motion.section
       id="features"
@@ -461,10 +575,10 @@ const TransferHighlight = () => {
       viewport={{ once: true, amount: 0.3 }}
     >
       <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-black dark:via-orange-950/10 dark:to-black" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
-          <motion.div 
+          <motion.div
             className="order-2 lg:order-1"
             variants={fadeIn}
           >
@@ -473,11 +587,11 @@ const TransferHighlight = () => {
                 Protected Transfers
               </span>
             </h2>
-            
+
             <p className="text-gray-700 dark:text-gray-300 text-lg mb-8">
               Unlike traditional crypto payments, DeFi Bank holds your transfer in escrow until the recipient claims it. No more sending funds to the wrong address or worrying about scams.
             </p>
-            
+
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <div className="mt-1 p-2 bg-orange-500/10 rounded-lg">
@@ -488,7 +602,7 @@ const TransferHighlight = () => {
                   <p className="text-gray-600 dark:text-gray-400">Share payment links via QR code or scan to pay instantly on mobile. Perfect for in-person transactions.</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-4">
                 <div className="mt-1 p-2 bg-orange-500/10 rounded-lg">
                   <ArrowPathIcon className="w-6 h-6 text-orange-500 dark:text-orange-400" />
@@ -498,7 +612,7 @@ const TransferHighlight = () => {
                   <p className="text-gray-600 dark:text-gray-400">Sent to the wrong person? Get your funds back instantly if they haven't been claimed yet.</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-4">
                 <div className="mt-1 p-2 bg-orange-500/10 rounded-lg">
                   <UserCircleIcon className="w-6 h-6 text-orange-500 dark:text-orange-400" />
@@ -509,7 +623,7 @@ const TransferHighlight = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-8">
               <Link href="/dashboard/transfer" className="inline-flex items-center space-x-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold text-lg transition-all duration-300 group">
                 <span>Try Protected Transfer</span>
@@ -517,8 +631,8 @@ const TransferHighlight = () => {
               </Link>
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="order-1 lg:order-2"
             variants={fadeIn}
           >
@@ -534,7 +648,7 @@ const TransferHighlight = () => {
                     </div>
                     <div className="text-orange-600 dark:text-orange-400 text-sm">Protected Transfer</div>
                   </div>
-                  
+
                   <div className="p-6">
                     <div className="mb-6 text-center">
                       <motion.div
@@ -548,7 +662,7 @@ const TransferHighlight = () => {
                       <h3 className="text-xl font-semibold text-orange-600 dark:text-orange-400">Secure Transaction</h3>
                       <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">Funds held in escrow until claimed</p>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="bg-gray-50 dark:bg-black/50 p-4 rounded-lg border border-gray-100 dark:border-orange-500/20">
                         <div className="text-gray-500 dark:text-gray-400 text-sm mb-2">Recipient</div>
@@ -571,7 +685,7 @@ const TransferHighlight = () => {
                         <div className="text-orange-600 dark:text-orange-400">Payment for design work</div>
                       </div>
                     </div>
-                    
+
                     <div className="mt-6">
                       <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold">
                         Confirm Transfer
@@ -597,14 +711,14 @@ const LandingPage = () => {
   return (
     <div className="flex flex-col min-h-screen text-gray-900 dark:text-white">
       <Navbar />
-      
+
       {/* Main content area */}
       <main className="flex-grow">
         <Hero />
         <TransferHighlight />
-        <ChainSlider />
+        <ErrorBoundary><FeatureIntros /></ErrorBoundary>
       </main>
-      
+
 
     </div>
   );

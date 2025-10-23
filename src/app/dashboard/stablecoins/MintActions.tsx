@@ -80,7 +80,7 @@ export default function MintActions({ address, scAddress, usdtAddress, symbol, a
   if (needApprove) {
     return (
       <button type="button" onClick={doApprove} disabled={approving} className="w-full md:w-auto px-6 py-3 rounded-xl bg-amber-500 text-white font-medium disabled:opacity-50">
-        {approving ? 'Approving…' : 'Approve USDC'}
+        {approving ? 'Approving…' : 'Approve'}
       </button>
     )
   }

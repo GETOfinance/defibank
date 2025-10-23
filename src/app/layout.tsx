@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'DeFi Bank | Secure HBAR Transfers on Hedera Testnet',
-  description: 'Secure HBAR transfers, group payments, and smart savings on the Hedera Testnet',
-  keywords: 'crypto, payments, Hedera, HBAR, DeFi, secure transfers, group payments',
+  title: 'DeFi Bank | Secure Transfers, Group Payments, Savings, African Stablecoins, DEX, Loans and Escrow on Hedera Testnet',
+  description: 'DeFi Bank provides Secure and protected transfers, group payments, savings, African stablecoins mint/burn, revolutionaly DEX, Loans, Escrow and Transaction history.',
+  keywords: 'crypto, payments, Hedera, HBAR, DeFi, secure transfers, group payments, DEX, Loans, Escrow',
   authors: [{ name: 'DeFi Bank' }],
 };
 
