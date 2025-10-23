@@ -1,0 +1,15 @@
+graph LR
+  U[User Wallet] --> F[Next.js App (DeFi Bank)]
+  F --> RK[RainbowKit + wagmi]
+  F --> PP[ProtectedPay (Transfers)]
+  F --> SC[StableCoins]
+  F --> LH[Loans Hub]
+  F --> OP[Orbital Pool]
+  OP --> MH[Math Helper (EVM)]
+  PP --> H[(Hedera Testnet 296)]
+  SC --> H
+  LH --> H
+  OP --> H
+  MO[Mock Oracle (demo)] --> SC
+  ENV[Static NEXT_PUBLIC_*] -. config .-> F
+

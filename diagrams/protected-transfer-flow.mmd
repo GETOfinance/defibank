@@ -1,0 +1,20 @@
+sequenceDiagram
+  autonumber
+  participant S as Sender
+  participant UI as DeFi Bank UI
+  participant C as ProtectedPay Contract
+  participant R as Recipient
+  S->>UI: Enter recipient / amount / remarks
+  UI->>C: send(recipient, amount, remarks)
+  C-->>UI: TransferCreated(id)
+  UI-->>S: Show pending transfer + copy/QR
+  R->>UI: Open Claim
+  UI->>C: claim(id)
+  C-->>UI: TransferClaimed(id)
+  alt Not claimed
+    S->>UI: Refund
+    UI->>C: refund(id)
+    C-->>UI: TransferRefunded(id)
+  end
+  UI-->>S: Auto-refresh balances & activity
+
