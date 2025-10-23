@@ -16,13 +16,16 @@ export interface OrbitalAddresses {
 }
 
 export function getOrbitalAddressesByChainId(chainId: number): OrbitalAddresses | null {
-  // Read .env.local injected values
-  const pool = process.env[`NEXT_PUBLIC_ORBITAL_POOL_ADDRESS_${chainId}` as any] as string | undefined;
-  const helper = process.env[`NEXT_PUBLIC_ORBITAL_HELPER_ADDRESS_${chainId}` as any] as string | undefined;
-  const tokensCSV = process.env[`NEXT_PUBLIC_ORBITAL_TOKENS_${chainId}` as any] as string | undefined;
-  if (!pool || !tokensCSV) return null;
-  const tokens = tokensCSV.split(',').map((s) => s.trim());
-  return { pool, helper, tokens };
+  // Use static references so Next.js can inline NEXT_PUBLIC_* at build time
+  if (chainId === 296) {
+    const pool = process.env.NEXT_PUBLIC_ORBITAL_POOL_ADDRESS_296 as string | undefined;
+    const helper = process.env.NEXT_PUBLIC_ORBITAL_HELPER_ADDRESS_296 as string | undefined;
+    const tokensCSV = process.env.NEXT_PUBLIC_ORBITAL_TOKENS_296 as string | undefined;
+    if (!pool || !tokensCSV) return null;
+    const tokens = tokensCSV.split(',').map((s) => s.trim());
+    return { pool, helper, tokens };
+  }
+  return null;
 }
 
 export function tokenIndex(symbol: TokenSymbol): number {

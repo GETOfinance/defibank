@@ -7,9 +7,12 @@ export interface LoansAddresses {
 }
 
 export function getLoansAddressesByChainId(chainId: number): LoansAddresses | null {
-  const hub = process.env[`NEXT_PUBLIC_LOANS_HUB_ADDRESS_${chainId}` as any] as string | undefined;
-  if (!hub) return null;
-  return { hub };
+  // Use static references so Next.js can inline NEXT_PUBLIC_* at build time
+  const MAP: Record<number, string | undefined> = {
+    296: process.env.NEXT_PUBLIC_LOANS_HUB_ADDRESS_296,
+  };
+  const hub = MAP[chainId];
+  return hub ? { hub } : null;
 }
 
 export function getHub(address: string, signerOrProvider: ethers.Signer | ethers.providers.Provider) {
