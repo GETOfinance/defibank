@@ -1,6 +1,6 @@
 # DeFi Bank (Super Crypto dApp in Africa)
 
- DeFi Bank, a DeFi web app targeting Hedera Testnet (EVM, chainId 296). It provides protected transfers (send to address/username with claim/refund), group payments, savings pots, stablecoin mint/burn (mock oracle or on-chain if configured), an experimental spherical-geometry AMM ("Orbital"), a wallet‑gated Loans UI, and unified history — all with modern UI/UX.
+ DeFi Bank, a DeFi web app targeting Hedera Testnet (EVM, chainId 296). It provides protected transfers (send to address/username with claim/refund), group payments, savings pots, stablecoin mint/burn (mock oracle or on-chain if configured), an experimental Revolutionary spherical-geometry AMM ("Orbital"), a wallet‑gated Loans UI, and unified history — all with modern UI/UX.
 
 ---
 
