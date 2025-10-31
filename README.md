@@ -173,6 +173,177 @@ How to use:
 2. Filter by type or refresh to fetch latest on-chain state
 
 ---
+## 🧭 Codebase Index (High Level)
+
+```
+./
+├─ README.md (this file)
+├─ paystablecoins20AllWoringEscrowFinalFinalFinal/   ← main app
+│  ├─ src/                  Next.js App Router (UI)
+│  │  ├─ app/              Routes: dashboard, transfer, escrow, exchange, loans, etc.
+│  │  ├─ components/       UI components (escrow, QR, orbital)
+│  │  ├─ hooks/            useEscrow, useOrbital, useLoans, etc.
+│  │  ├─ utils/            contract clients (escrow, stablecoins, ERC‑20, orbital)
+│  │  └─ context/          Wallet (RainbowKit/wagmi) provider
+│  ├─ contracts/           Solidity (EscrowHub, ProtectedPay, StableCoins, Orbital, Loans)
+│  ├─ public/              icons, screenshots
+│  ├─ diagrams/            Mermaid sources (architecture, flows)
+│  └─ package.json         app scripts (dev/build/deploy)
+```
+
+For the complete, detailed index see: paystablecoins20AllWoringEscrowFinalFinalFinal/CODEBASE_INDEX.md
+
+## 🧱 System Architecture
+
+```
++-----------------------------------------------------------------------------------+
+|                                   Browser (Next.js React UI)                      |
+|  - Pages (App Router): dashboard, transfer, escrow, exchange, loans, etc.         |
+|  - Components & Hooks: useEscrow, useOrbital, useLoans, QR scanner                 |
+|  - Wallet Provider: RainbowKit / wagmi (WalletConnect, MetaMask)                  |
++---------------------------+------------------------------+------------------------+
+                            |                              |
+                            v                              v
+                  +------------------+             +---------------------------+
+                  | Client Utilities |             |  RPC Provider (viem/ethers)|
+                  |  src/utils/*     |             |  -> https://testnet.hashio.io |
+                  |  - escrow client |             +---------------------------+
+                  |  - contract.ts   |                          |
+                  |  - erc20 client  |                          v
+                  |  - stablecoins    |               +------------------------------+
+                  |  - orbital client |               | Hedera EVM (Chain ID 296)    |
+                  +------------------+               | - ProtectedPay               |
+                                                     | - EscrowHub                  |
+                                                     | - StableCoins + Oracle (mock)|
+                                                     | - Loans Hub                  |
+                                                     | - Orbital AMM + Math Helper  |
+                                                     +------------------------------+
+```
+
+Notes:
+- All blockchain reads/writes go through wagmi/viem/ethers to Hedera EVM via Hashio RPC.
+- No custom backend; state is primarily on-chain and in client state/query cache.
+
+## 🔄 Data Flow (Key User Journeys)
+
+```
++------------------+      +------------------------+      +---------------------+      +---------------------------+      +-----------------------------+
+|      User        | ---> | Next.js Page (React UI)| ---> | Client Utilities    | ---> | wagmi/viem (Sign & Send)  | ---> | Hedera EVM (Chain ID 296)   |
+| (Wallet: MM/WC)  |      | Forms, QR, toasts      |      | src/utils/*         |      | RPC: Hashio               |      | Contracts:                  |
+|                  |      |                        |      | escrow, contract.ts |      | Wallet Provider           |      |  - ProtectedPay             |
++------------------+      +------------------------+      +---------------------+      +---------------------------+      |  - EscrowHub                |
+                                                                                                                         |  - StableCoins (+ Oracle)   |
+                                                                                                                         |  - Orbital AMM, Loans Hub   |
+                                                                                                                         +-----------------------------+
+                                                                                                                                                |
+                                                                                                                                                | receipts + events / read data
+                                                                                                                                                v
++------------------+      +------------------------+      +---------------------+      +---------------------------+      +-----------------------------+
+| UI State Update  | <--- | React Query / Cache    | <--- | viem readContract   | <--- | RPC Provider (Hashio)     | <--- | Hedera EVM (Chain ID 296)   |
++------------------+      +------------------------+      +---------------------+      +---------------------------+      +-----------------------------+
+
+Legend / Examples:
+- Protected Transfer: sendProtectedTransfer / claimTransfer / refundTransfer  -> Hedera EVM -> ProtectedPay
+- Escrow: createEscrow / confirmDelivery / refund / claimAfterExpiry         -> Hedera EVM -> EscrowHub
+- StableCoins: mint / burn (oracle-admin gated)                              -> Hedera EVM -> StableCoins (+ Oracle)
+- Orbital AMM: quote / swap / add/remove liquidity                           -> Hedera EVM -> Orbital Pool/Helper
+```
+
+
+
+## 🚀 How It Works
+
+
+### Feature-specific Data Flow Diagrams
+
+<details>
+<summary>Protected Transfers (ProtectedPay)</summary>
+
+```
++--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
+| Sender (Wallet)    |->| Transfer UI (Next.js)     |->| contract.ts (send...)  |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): ProtectedPay      |
++--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
+                                                                                                                            | events: TransferCreated/Claimed/Refunded
+                                                                                                                            v
+                                                                                                      viem readContract -> React Query cache -> UI update
+
++--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
+| Recipient (Wallet) |->| Claim UI (Next.js)        |->| contract.ts (claim...) |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): ProtectedPay      |
++--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
+```
+
+</details>
+
+<details>
+<summary>Escrow (EscrowHub)</summary>
+
+```
+Create Escrow
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+| Buyer (Wallet)     |->| Escrow UI (Next.js)       |->| escrow/client.ts (new)  |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): EscrowHub         |
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+                                                                                                                            | locks funds, emits EscrowCreated
+                                                                                                                            v
+                                                                                                      viem readContract -> React Query cache -> UI update
+
+Confirm Delivery
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+| Buyer (Wallet)     |->| Escrow UI (Next.js)       |->| escrow/client.ts (ok)   |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): EscrowHub         |
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+                                                                                                                            | releases to Seller, EscrowCompleted
+                                                                                                                            v
+                                                                                                      viem readContract -> React Query cache -> UI update
+
+Claim After Expiry / Refund
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+| Seller/Owner       |->| Escrow UI (Next.js)       |->| escrow/client.ts        |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): EscrowHub         |
++--------------------+  +---------------------------+  +-------------------------+  +----------------------+  +-------------------------------------------+
+                                                                                                                            | payout Seller or refund Buyer
+```
+
+</details>
+
+<details>
+<summary>StableCoins (StableCoins + Oracle)</summary>
+
+```
+Mint / Burn (Admin-gated)
++--------------------+  +---------------------------+  +-------------------------------+  +----------------------+  +--------------------------------------------------+
+| Admin (Wallet)     |->| StableCoins UI (Next.js)  |->| stablecoinsClient.ts (mint/..) |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): StableCoins (+ Oracle)   |
++--------------------+  +---------------------------+  +-------------------------------+  +----------------------+  +--------------------------------------------------+
+                                                                                                                                    | updates supply, emits events
+                                                                                                                                    v
+                                                                                                              viem readContract -> React Query -> UI update
+
+Transfer (Users)
++--------------------+  +---------------------------+  +-------------------------------+  +----------------------+  +--------------------------------------------------+
+| User (Wallet)      |->| StableCoins UI (Next.js)  |->| erc20Client.ts (transfer)      |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): StableCoins (ERC-20)     |
++--------------------+  +---------------------------+  +-------------------------------+  +----------------------+  +--------------------------------------------------+
+```
+
+</details>
+
+<details>
+<summary>Orbital AMM (Orbital Pool / Helper)</summary>
+
+```
+Quote (Read)
++--------------------+  +---------------------------+  +---------------------------+  +---------------------------+  +----------------------------------------------+
+| Trader (Wallet)    |->| Exchange UI (Next.js)     |->| orbital/client.ts (quote) |->| viem readContract (RPC)   |->| Hedera EVM (Chain 296): Orbital Pool/Helper  |
++--------------------+  +---------------------------+  +---------------------------+  +---------------------------+  +----------------------------------------------+
+                                                                                                                       | returns quote, pool/reserves state
+                                                                                                                       v
+                                                                                                   UI displays price impact, route, fees
+
+Swap / Liquidity (Write)
++--------------------+  +---------------------------+  +---------------------------+  +----------------------+  +----------------------------------------------+
+| Trader (Wallet)    |->| Exchange UI (Next.js)     |->| orbital/client.ts (swap)  |->| wagmi/viem (sign tx) |->| Hedera EVM (Chain 296): Orbital Pool/Helper  |
++--------------------+  +---------------------------+  +---------------------------+  +----------------------+  +----------------------------------------------+
+                                                                                                                       | updates pool, mints/burns LP, emits events
+                                                                                                                       v
+                                                                                                   viem readContract -> React Query -> UI update
+```
+
 
 ## How to Run Locally
 Prerequisites:
