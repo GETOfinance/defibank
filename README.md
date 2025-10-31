@@ -191,7 +191,6 @@ How to use:
 │  └─ package.json         app scripts (dev/build/deploy)
 ```
 
-For the complete, detailed index see: paystablecoins20AllWoringEscrowFinalFinalFinal/CODEBASE_INDEX.md
 
 ## 🧱 System Architecture
 
