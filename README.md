@@ -4,6 +4,11 @@
 
 ---
 
+## 🗂️ Documents Required
+
+- [Hedera Hashgraph Developer Certificate](./docs/Mike-Nsereko-DeveloperCertificate.pdf)
+- [Pitch Deck](./docs/pitch-DeFiBank.pdf)
+
 ## Table of Contents
 - Overview
 - Tech Stack
