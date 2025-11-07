@@ -277,8 +277,7 @@ Protected Transfers (ProtectedPay)
 
 
 
-<details>
-<summary>Escrow (EscrowHub)</summary>
+Escrow (EscrowHub)
 
 ```
 Create Escrow
@@ -304,10 +303,9 @@ Claim After Expiry / Refund
                                                                                                                             | payout Seller or refund Buyer
 ```
 
-</details>
 
-<details>
-<summary>StableCoins (StableCoins + Oracle)</summary>
+
+StableCoins (StableCoins + Oracle)
 
 ```
 Mint / Burn (Admin-gated)
@@ -324,10 +322,7 @@ Transfer (Users)
 +--------------------+  +---------------------------+  +-------------------------------+  +----------------------+  +--------------------------------------------------+
 ```
 
-</details>
-
-<details>
-<summary>Orbital AMM (Orbital Pool / Helper)</summary>
+Orbital AMM (Orbital Pool / Helper)
 
 ```
 Quote (Read)
