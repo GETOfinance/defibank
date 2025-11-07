@@ -260,8 +260,7 @@ Legend / Examples:
 
 ### Feature-specific Data Flow Diagrams
 
-<details>
-<summary>Protected Transfers (ProtectedPay)</summary>
+Protected Transfers (ProtectedPay)
 
 ```
 +--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
@@ -276,7 +275,7 @@ Legend / Examples:
 +--------------------+  +---------------------------+  +------------------------+  +----------------------+  +-------------------------------------------+
 ```
 
-</details>
+
 
 <details>
 <summary>Escrow (EscrowHub)</summary>
