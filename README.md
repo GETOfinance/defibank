@@ -49,38 +49,13 @@ DeFi Bank focuses on practical payments and pooled finance on Hedera Testnet:
 - Chain: Hedera Testnet (EVM, chainId 296)
 
 
-## Screenshots & GIFs
+## DeFi Bank AMM, a revolutionary Orbital Automated Market Makers (AMMs)
 
-Place screenshots/GIFs under `public/screenshots/` so they render on GitHub using relative paths.
-Suggested captures and filenames (you can rename):
+Orbital AMM + Helper: experimental spherical invariant pool (demo swaps use fixed FX) Using next generation of Automated Market Makers (AMMs)—an AMM that doesn’t stop at two-token pairs, but can scale to support 2, 3, or even 10,000 stablecoins in a single pool. Inspired by Paradigm’s Orbital model, our design bends liquidity into a torus-shaped universe, extending concentrated liquidity into higher dimensions. This innovation lets liquidity providers concentrate around the $1 peg across multiple stablecoins at once, ensuring both capital efficiency and robust pricing, even if an asset collapses to zero.
 
-- Landing: `landing.png`
-- Dashboard: `dashboard.png`
-- Transfer flow: `transfer-send.png`, `transfer-claim.png`
-- Group Payments: `group-create.png`, `group-contribute.png`
-- Savings Pots: `savings-create.png`, `savings-progress.png`
-- StableCoins mint/burn GIF: `stablecoins-mint.gif`
-- Exchange swap GIF: `exchange-swap.gif`
-- Orbital Pool: `orbital-pool.png`
-- Loans UI: `loans.png`
-- History: `history.png`
+![Exchange](./public/screenshots/amm.png)
 
-Preview embed (will display once you drop files into `public/screenshots/`):
-
-![Landing](./public/screenshots/landing.png)
-![Dashboard](./public/screenshots/dashboard.png)
-
-![StableCoins Mint](./public/screenshots/stablecoins-mint.gif)
-![Exchange Swap](./public/screenshots/exchange-swap.gif)
-
-![Group Payment Create](./public/screenshots/group-create.png)
-![Group Payment Contribute](./public/screenshots/group-contribute.png)
-
-![Savings Pots](./public/screenshots/savings-progress.png)
-![Loans](./public/screenshots/loans.png)
-
-![Orbital Pool](./public/screenshots/orbital-pool.png)
-![History](./public/screenshots/history.png)
+Orbital combines the surgical precision of Uniswap V3 with the bulletproof stability of Curve, fusing their strengths into a single protocol. By integrating advanced mathematics like vector operations, Newton’s method for solving invariants, and high-dimensional geometry with modern blockchain tooling like Stylus and Solidity, we’re pushing the boundaries of what AMMs can do.
 
 ---
 
