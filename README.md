@@ -53,7 +53,7 @@ DeFi Bank focuses on practical payments and pooled finance on Hedera Testnet:
 
 Orbital AMM + Helper: experimental spherical invariant pool (demo swaps use fixed FX) Using next generation of Automated Market Makers (AMMs)—an AMM that doesn’t stop at two-token pairs, but can scale to support 2, 3, or even 10,000 stablecoins in a single pool. Inspired by Paradigm’s Orbital model, our design bends liquidity into a torus-shaped universe, extending concentrated liquidity into higher dimensions. This innovation lets liquidity providers concentrate around the $1 peg across multiple stablecoins at once, ensuring both capital efficiency and robust pricing, even if an asset collapses to zero.
 
-![Exchange](./public/screenshots/amm.png)
+![Exchange](./diagrams/amm.png)
 
 Orbital combines the surgical precision of Uniswap V3 with the bulletproof stability of Curve, fusing their strengths into a single protocol. By integrating advanced mathematics like vector operations, Newton’s method for solving invariants, and high-dimensional geometry with modern blockchain tooling like Stylus and Solidity, we’re pushing the boundaries of what AMMs can do.
 
